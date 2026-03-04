@@ -1,0 +1,15 @@
+(z == 1): Color.Red     // 前面 (Z正)
+(z == -1): Color.Orange   // 后面 (Z负)
+(y == 1): Color.White    // 上面 (Y正)
+(y == -1): Color.Yellow  // 下面 (Y负)
+(x == 1): Color.Blue     // 右面 (X正) 
+(x == -1): Color.Green   // 左面 (X负) 
+
+       +-------+
+        | White |
++-------+-------+-------+-------+
+| Green | Red   | Blue  | Orange|
++-------+-------+-------+-------+
+        | Yellow|
+        +-------+
+

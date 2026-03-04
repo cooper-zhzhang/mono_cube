@@ -117,8 +117,8 @@ namespace cube_game
         private Matrix _projection;
         private List<CubePiece> _cubes; // 存储27个方块
         private float _timer = 0; // 计时器
-        private float _rotationProgress = 0; // 旋转进度（0-1）
-        private float _rotationDuration = 02f; // 旋转持续时间（秒），越小速度越快 旋转90度的时间
+        //private float _rotationProgress = 0; // 旋转进度（0-1）
+        private float _rotationDuration = 0.5f; // 旋转持续时间（秒），越小速度越快 旋转90度的时间
         private bool _isRotating = false; // 是否正在旋转
 
         private char _currentFace = ' '; // 当前要旋转的面，' '表示等待输入
@@ -307,14 +307,14 @@ namespace cube_game
             {
                 // 开始旋转
                 _isRotating = true;
-                _rotationProgress = 0;
+                //_rotationProgress = 0;
                 _timer = 0;
             }
             else if (_isRotating)
             {
                 // 正在旋转：根据_rotationDuration内完成PiOver2旋转
-                _rotationProgress = Math.Min(1.0f, _timer / _rotationDuration);
-                float currentRotation = _rotationProgress * MathHelper.PiOver2;
+                float rotationProgress = Math.Min(1.0f, _timer / _rotationDuration);
+                float currentRotation = rotationProgress * MathHelper.PiOver2;
 
                 // 创建旋转矩阵
                 Matrix rotation = CreateRotationMatrix(_currentFace, currentRotation);
@@ -340,7 +340,7 @@ namespace cube_game
                 }
 
                 // 旋转完成
-                if (_rotationProgress >= 1.0f)
+                if (rotationProgress >= 1.0f)
                 {
                     CompleteRotation();
                 }
