@@ -1,0 +1,18 @@
+# 编译输出
+bin/
+obj/
+
+# MonoGame内容编译缓存
+Content/obj/
+Content/*.mgstats
+
+# IDE配置（如果需要共享IDE配置，可以注释掉）
+# .vscode/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 用户特定的文件
+*.user
+*.suo

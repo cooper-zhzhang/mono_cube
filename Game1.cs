@@ -32,13 +32,6 @@ namespace cube_game
             OriginalPosition = newPosition;
         }
 
-        // 更新颜色
-        public void UpdateColors(Color[] newColors)
-        {
-            _faceColors = newColors;
-            BuildCube(); // 重新构建立方体，更新颜色
-        }
-
         // 每个面的颜色（数组顺序：前、后、上、下、左、右）
         private Color[] _faceColors;
 
@@ -123,29 +116,29 @@ namespace cube_game
         private Matrix _view;
         private Matrix _projection;
         private List<CubePiece> _cubes; // 存储27个方块
-        private float _rotationAngle = 0;
         private float _timer = 0; // 计时器
         private float _rotationProgress = 0; // 旋转进度（0-1）
+        private float _rotationDuration = 02f; // 旋转持续时间（秒），越小速度越快 旋转90度的时间
         private bool _isRotating = false; // 是否正在旋转
 
-        private int dasd = 0;
+        private char _currentFace = ' '; // 当前要旋转的面，' '表示等待输入
         
         // 创建旋转矩阵
-        private Matrix CreateRotationMatrix(int faceIndex, float angle)
+        private Matrix CreateRotationMatrix(char face, float angle)
         {
-            switch (faceIndex)
+            switch (face)
             {
-                case 0: // 最上层面绕y轴旋转（顺时针）
-                    return Matrix.CreateRotationY(angle);
-                case 1: // 最下层面绕y轴旋转（逆时针，与最上面相反）
+                case 'u': // 最上层面绕y轴旋转（顺时针）
                     return Matrix.CreateRotationY(-angle);
-                case 3: // 最左层面绕x轴旋转
+                case 'd': // 最下层面绕y轴旋转（逆时针，与最上面相反）
+                    return Matrix.CreateRotationY(angle);
+                case 'l': // 最左层面绕x轴旋转
                     return Matrix.CreateRotationX(angle);
-                case 2: // 最右层面绕x轴旋转（与最左面相反）
+                case 'r': // 最右层面绕x轴旋转（与最左面相反）
                     return Matrix.CreateRotationX(-angle);
-                case 4: // 最前层面绕z轴旋转
-                    return Matrix.CreateRotationZ(angle);
-                case 5: // 最后层面绕z轴旋转（与最前面相反）
+                case 'f': // 最前层面绕z轴旋转
+                    return Matrix.CreateRotationZ(-angle);
+                case 'b': // 最后层面绕z轴旋转（与最前面相反）
                     return Matrix.CreateRotationZ(-angle);
                 default:
                     return Matrix.Identity;
@@ -153,29 +146,76 @@ namespace cube_game
         }
         
         // 检查立方体是否需要旋转
-        private bool ShouldRotateCube(CubePiece cube, int faceIndex)
+        private bool ShouldRotateCube(CubePiece cube, char face)
         {
-            switch (faceIndex)
+            switch (face)
             {
-                case 0: // 最上层面绕y轴旋转
+                case 'u': // 最上层面绕y轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.Y - 1) < 0.001f;
-                case 1: // 最下层面绕y轴旋转
+                case 'd': // 最下层面绕y轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.Y - (-1)) < 0.001f;
-                case 3: // 最左层面绕x轴旋转
+                case 'l': // 最左层面绕x轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.X - (-1)) < 0.001f;
-                case 2: // 最右层面绕x轴旋转
+                case 'r': // 最右层面绕x轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.X - 1) < 0.001f;
-                case 4: // 最前层面绕z轴旋转
-                    return Math.Abs(cube.OriginalMatrix.Translation.Z - (-1)) < 0.001f;
-                case 5: // 最后层面绕z轴旋转
+                case 'f': // 最前层面绕z轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.Z - 1) < 0.001f;
+                case 'b': // 最后层面绕z轴旋转
+                    return Math.Abs(cube.OriginalMatrix.Translation.Z - (-1)) < 0.001f;
                 default:
                     return false;
             }
         }
+        
+        // 更新立方体矩阵，应用旋转并四舍五入位置
+        private void UpdateCubeMatrix(CubePiece cube, Matrix rotation)
+        {
+            // 使用OriginalMatrix和完整的旋转角度一次计算，减少误差
+            Matrix transformedMatrix = cube.OriginalMatrix * rotation;
+            
+            // 四舍五入到整数坐标，避免浮点数误差
+            Vector3 roundedPosition = new Vector3(
+                MathF.Round(transformedMatrix.Translation.X),
+                MathF.Round(transformedMatrix.Translation.Y),
+                MathF.Round(transformedMatrix.Translation.Z)
+            );
+            
+            // 归一化四元数，确保旋转部分正确
+            Quaternion rotationQuaternion = Quaternion.CreateFromRotationMatrix(transformedMatrix);
+            rotationQuaternion.Normalize();
+            
+            // 创建新的矩阵，保持旋转但重置位置为整数
+            Matrix rotationMatrix = Matrix.CreateFromQuaternion(rotationQuaternion);
+            Matrix translationMatrix = Matrix.CreateTranslation(roundedPosition);
+            Matrix finalMatrix = rotationMatrix * translationMatrix;
+            
+            // 更新矩阵
+            cube.OriginalMatrix = finalMatrix;
+            cube.World = finalMatrix;
+        }
+        
+        // 完成旋转，更新所有立方体矩阵并重置状态
+        private void CompleteRotation()
+        {
+            // 使用完整的旋转角度（PiOver2）一次计算，减少浮点数误差
+            Matrix finalRotation = CreateRotationMatrix(_currentFace, MathHelper.PiOver2);
+
+            for (int i = 0; i < _cubes.Count; i++)
+            {
+                var cube = _cubes[i];
+                if (ShouldRotateCube(cube, _currentFace))
+                {
+                    UpdateCubeMatrix(cube, finalRotation);
+                }
+            }
+
+            _isRotating = false;
+            _timer = 0;
+            _currentFace = ' '; // 重置为等待输入状态
+        }
 
 
-        private bool _isPaused = false; // 是否正在暂停
+
 
         public Game1()
         {
@@ -199,7 +239,7 @@ namespace cube_game
             _effect.LightingEnabled = false;
 
             // 设置相机，将视点拉远以看到整个大立方体
-            _view = Matrix.CreateLookAt(new Vector3(5, 5, 5), Vector3.Zero, Vector3.Up);
+            _view = Matrix.CreateLookAt(new Vector3(4, 5, 8), Vector3.Zero, Vector3.Up);
             _projection = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.PiOver4,
                 GraphicsDevice.Viewport.AspectRatio,
@@ -220,8 +260,8 @@ namespace cube_game
                         // 为每个方块生成6个面的颜色，使用魔方标准颜色
                         Color[] faceColors = new Color[6];
                         // 魔方标准颜色：前红、后橙、上白、下黄、左绿、右蓝
-                        faceColors[0] = (z == -1) ? Color.Red : Color.Black;     // 前面 (Z负)
-                        faceColors[1] = (z == 1) ? Color.Orange : Color.Black;   // 后面 (Z正)
+                        faceColors[0] = (z == -1) ? Color.Red : Color.Black;     // 前面 (Z正)
+                        faceColors[1] = (z == 1) ? Color.Orange : Color.Black;   // 后面 (Z负)
                         faceColors[2] = (y == 1) ? Color.White : Color.Black;    // 上面 (Y正)
                         faceColors[3] = (y == -1) ? Color.Yellow : Color.Black;  // 下面 (Y负)
                         faceColors[4] = (x == 1) ? Color.Blue : Color.Black;     // 右面 (X正) - 索引4
@@ -240,11 +280,30 @@ namespace cube_game
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+
             // 计时器累加
             _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            // 检测键盘输入（只在等待输入状态时检测）
+            if (!_isRotating && _currentFace == ' ')
+            {
+                var keyboardState = Keyboard.GetState();
+                if (keyboardState.IsKeyDown(Keys.U))
+                    _currentFace = 'u';
+                else if (keyboardState.IsKeyDown(Keys.D))
+                    _currentFace = 'd';
+                else if (keyboardState.IsKeyDown(Keys.L))
+                    _currentFace = 'l';
+                else if (keyboardState.IsKeyDown(Keys.R))
+                    _currentFace = 'r';
+                else if (keyboardState.IsKeyDown(Keys.F))
+                    _currentFace = 'f';
+                else if (keyboardState.IsKeyDown(Keys.B))
+                    _currentFace = 'b';
+            }
+
             // 状态管理
-            if (!_isRotating && !_isPaused)
+            if (!_isRotating && _currentFace != ' ')
             {
                 // 开始旋转
                 _isRotating = true;
@@ -253,20 +312,20 @@ namespace cube_game
             }
             else if (_isRotating)
             {
-                // 正在旋转：3秒内完成PiOver2旋转
-                _rotationProgress = Math.Min(1.0f, _timer / 3.0f);
+                // 正在旋转：根据_rotationDuration内完成PiOver2旋转
+                _rotationProgress = Math.Min(1.0f, _timer / _rotationDuration);
                 float currentRotation = _rotationProgress * MathHelper.PiOver2;
 
                 // 创建旋转矩阵
-                Matrix rotation = CreateRotationMatrix(dasd, currentRotation);
+                Matrix rotation = CreateRotationMatrix(_currentFace, currentRotation);
 
                 // 更新每个小立方体的世界矩阵
                 foreach (var cube in _cubes)
                 {
                     bool shouldRotate = false;
 
-                    // 根据dasd的值选择对应的面进行旋转
-                    shouldRotate = ShouldRotateCube(cube, dasd);
+                    // 根据_currentFace的值选择对应的面进行旋转
+                    shouldRotate = ShouldRotateCube(cube, _currentFace);
 
                     if (shouldRotate)
                     {
@@ -283,60 +342,9 @@ namespace cube_game
                 // 旋转完成
                 if (_rotationProgress >= 1.0f)
                 {
-                    // 使用完整的旋转角度（PiOver2）一次计算，减少浮点数误差
-                    Matrix finalRotation = CreateRotationMatrix(dasd, MathHelper.PiOver2);
-
-                    for (int i = 0; i < _cubes.Count; i++)
-                    {
-                        var cube = _cubes[i];
-                        bool shouldRotate = ShouldRotateCube(cube, dasd);
-
-                        if (shouldRotate)
-                        {
-                            // 使用OriginalMatrix和完整的旋转角度一次计算，减少误差
-                            Matrix transformedMatrix = cube.OriginalMatrix * finalRotation;
-                            
-                            // 四舍五入到整数坐标，避免浮点数误差
-                            Vector3 roundedPosition = new Vector3(
-                                MathF.Round(transformedMatrix.Translation.X),
-                                MathF.Round(transformedMatrix.Translation.Y),
-                                MathF.Round(transformedMatrix.Translation.Z)
-                            );
-
-
-                             // 归一化四元数，确保旋转部分正确
-                            Quaternion rotationQuaternion = Quaternion.CreateFromRotationMatrix(transformedMatrix);
-                            rotationQuaternion.Normalize();
-                            
-                            // 创建新的矩阵，保持旋转但重置位置为整数
-                            Matrix rotationMatrix = Matrix.CreateFromQuaternion(rotationQuaternion);
-                            Matrix translationMatrix = Matrix.CreateTranslation(roundedPosition);
-                            Matrix finalMatrix = rotationMatrix * translationMatrix;
-                            
-                            // 更新矩阵
-                            cube.OriginalMatrix = finalMatrix; 
-                            cube.World = finalMatrix;
-                        }
-                    }
-
-                    _isRotating = false;
-                    _isPaused = true;
-                    _rotationAngle += MathHelper.PiOver2;
-                    _timer = 0;
-                    dasd++;
-                    dasd = dasd % 6;
+                    CompleteRotation();
                 }
             }
-            else if (_isPaused)
-            {
-                // 正在暂停：暂停2秒
-                if (_timer >= 2.0f)
-                {
-                    _isPaused = false;
-                    _timer = 0;
-                }
-            }
-
             base.Update(gameTime);
         }
 
