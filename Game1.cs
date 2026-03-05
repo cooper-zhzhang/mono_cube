@@ -140,18 +140,18 @@ namespace cube_game
         {
             switch (face)
             {
-                case 'u': // 最上层面绕Y轴旋转（右手系中正角度绕Y轴逆时针，此处取反以匹配原顺时针）
-                    return Matrix.CreateRotationY(angle);      // 原为 -angle
+                case 'u': // 最上层面绕Y轴旋转
+                    return Matrix.CreateRotationY(-angle);
                 case 'd': // 最下层面绕Y轴旋转
-                    return Matrix.CreateRotationY(-angle);     // 原为  angle
+                    return Matrix.CreateRotationY(-angle);    
                 case 'l': // 最左层面绕X轴旋转
-                    return Matrix.CreateRotationX(-angle);     // 原为  angle
+                    return Matrix.CreateRotationX(angle);     
                 case 'r': // 最右层面绕X轴旋转
-                    return Matrix.CreateRotationX(angle);      // 原为 -angle
+                    return Matrix.CreateRotationX(-angle);      
                 case 'f': // 最前层面绕Z轴旋转
-                    return Matrix.CreateRotationZ(angle);      // 原为 -angle
+                    return Matrix.CreateRotationZ(-angle);      
                 case 'b': // 最后层面绕Z轴旋转
-                    return Matrix.CreateRotationZ(angle);      // 原为 -angle（此处保持与原逻辑一致）
+                    return Matrix.CreateRotationZ(angle);      
                 default:
                     return Matrix.Identity;
             }
