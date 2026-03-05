@@ -10,6 +10,8 @@ using System.Collections.Specialized;
 
 namespace cube_game
 {
+
+
     public class CubePiece
     {
         private GraphicsDevice _graphicsDevice;
@@ -122,7 +124,23 @@ namespace cube_game
         private bool _isRotating = false; // 是否正在旋转
 
         private char _currentFace = ' '; // 当前要旋转的面，' '表示等待输入
-        
+        private string _cubeState = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // 魔方状态字符串
+
+        // 颜色映射：U=白, D=黄, F=红, B=橙, L=绿, R=蓝
+        private Color GetColorFromChar(char c)
+        {
+            switch (c)
+            {
+                case 'U': return Color.White;
+                case 'D': return Color.Yellow;
+                case 'F': return Color.Red;
+                case 'B': return Color.Orange;
+                case 'L': return Color.Green;
+                case 'R': return Color.Blue;
+                default: return Color.Black;
+            }
+        }
+
         // 创建旋转矩阵
         private Matrix CreateRotationMatrix(char face, float angle)
         {
@@ -144,7 +162,7 @@ namespace cube_game
                     return Matrix.Identity;
             }
         }
-        
+
         // 检查立方体是否需要旋转
         private bool ShouldRotateCube(CubePiece cube, char face)
         {
@@ -159,41 +177,41 @@ namespace cube_game
                 case 'r': // 最右层面绕x轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.X - 1) < 0.001f;
                 case 'f': // 最前层面绕z轴旋转
-                    return Math.Abs(cube.OriginalMatrix.Translation.Z - 1) < 0.001f;
-                case 'b': // 最后层面绕z轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.Z - (-1)) < 0.001f;
+                case 'b': // 最后层面绕z轴旋转
+                    return Math.Abs(cube.OriginalMatrix.Translation.Z - 1) < 0.001f;
                 default:
                     return false;
             }
         }
-        
+
         // 更新立方体矩阵，应用旋转并四舍五入位置
         private void UpdateCubeMatrix(CubePiece cube, Matrix rotation)
         {
             // 使用OriginalMatrix和完整的旋转角度一次计算，减少误差
             Matrix transformedMatrix = cube.OriginalMatrix * rotation;
-            
+
             // 四舍五入到整数坐标，避免浮点数误差
             Vector3 roundedPosition = new Vector3(
                 MathF.Round(transformedMatrix.Translation.X),
                 MathF.Round(transformedMatrix.Translation.Y),
                 MathF.Round(transformedMatrix.Translation.Z)
             );
-            
+
             // 归一化四元数，确保旋转部分正确
             Quaternion rotationQuaternion = Quaternion.CreateFromRotationMatrix(transformedMatrix);
             rotationQuaternion.Normalize();
-            
+
             // 创建新的矩阵，保持旋转但重置位置为整数
             Matrix rotationMatrix = Matrix.CreateFromQuaternion(rotationQuaternion);
             Matrix translationMatrix = Matrix.CreateTranslation(roundedPosition);
             Matrix finalMatrix = rotationMatrix * translationMatrix;
-            
+
             // 更新矩阵
             cube.OriginalMatrix = finalMatrix;
             cube.World = finalMatrix;
         }
-        
+
         // 完成旋转，更新所有立方体矩阵并重置状态
         private void CompleteRotation()
         {
@@ -257,15 +275,76 @@ namespace cube_game
                     {
                         Vector3 pos = new Vector3(x, y, z);
 
-                        // 为每个方块生成6个面的颜色，使用魔方标准颜色
+                        // 为每个方块生成6个面的颜色，使用魔方状态字符串
                         Color[] faceColors = new Color[6];
-                        // 魔方标准颜色：前红、后橙、上白、下黄、左绿、右蓝
-                        faceColors[0] = (z == -1) ? Color.Red : Color.Black;     // 前面 (Z正)
-                        faceColors[1] = (z == 1) ? Color.Orange : Color.Black;   // 后面 (Z负)
-                        faceColors[2] = (y == 1) ? Color.White : Color.Black;    // 上面 (Y正)
-                        faceColors[3] = (y == -1) ? Color.Yellow : Color.Black;  // 下面 (Y负)
-                        faceColors[4] = (x == 1) ? Color.Blue : Color.Black;     // 右面 (X正) - 索引4
-                        faceColors[5] = (x == -1) ? Color.Green : Color.Black;   // 左面 (X负) - 索引5
+                        
+                        // 面索引：0=前(Z正), 1=后(Z负), 2=上(Y正), 3=下(Y负), 4=右(X正), 5=左(X负)
+                        
+                        // 上面 (U): y=1，状态字符串位置0-8
+                        if (y == 1)
+                        {
+                            int row = 1 - z; // z=-1→row=2, z=0→row=1, z=1→row=0
+                            int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
+                            int index = row * 3 + col;
+                            faceColors[2] = GetColorFromChar(_cubeState[index]);
+                        } else {
+                            faceColors[2] = Color.Black;
+                        }
+                        
+                        // 右面 (R): x=1，状态字符串位置9-17
+                        if (x == 1)
+                        {
+                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                            int col = z + 1; // z=-1→col=0, z=0→col=1, z=1→col=2
+                            int index = 9 + row * 3 + col;
+                            faceColors[4] = GetColorFromChar(_cubeState[index]);
+                        } else {
+                            faceColors[4] = Color.Black;
+                        }
+                        
+                        // 前面 (F): z=-1，状态字符串位置18-26
+                        if (z == -1)
+                        {
+                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                            int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
+                            int index = 18 + row * 3 + col;
+                            faceColors[0] = GetColorFromChar(_cubeState[index]);
+                        } else {
+                            faceColors[0] = Color.Black;
+                        }
+                        
+                        // 下面 (D): y=-1，状态字符串位置27-35
+                        if (y == -1)
+                        {
+                            int row = z + 1; // z=-1→row=0, z=0→row=1, z=1→row=2
+                            int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
+                            int index = 27 + row * 3 + col;
+                            faceColors[3] = GetColorFromChar(_cubeState[index]);
+                        } else {
+                            faceColors[3] = Color.Black;
+                        }
+                        
+                        // 左面 (L): x=-1，状态字符串位置36-44
+                        if (x == -1)
+                        {
+                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                            int col = 1 - z; // z=-1→col=2, z=0→col=1, z=1→col=0 (镜像)
+                            int index = 36 + row * 3 + col;
+                            faceColors[5] = GetColorFromChar(_cubeState[index]);
+                        } else {
+                            faceColors[5] = Color.Black;
+                        }
+                        
+                        // 后面 (B): z=1，状态字符串位置45-53
+                        if (z == 1)
+                        {
+                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                            int col = 1 - x; // x=-1→col=2, x=0→col=1, x=1→col=0 (镜像)
+                            int index = 45 + row * 3 + col;
+                            faceColors[1] = GetColorFromChar(_cubeState[index]);
+                        } else {
+                            faceColors[1] = Color.Black;
+                        }
 
                         _cubes.Add(new CubePiece(GraphicsDevice, pos, faceColors));
                     }
