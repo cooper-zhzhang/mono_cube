@@ -6,159 +6,21 @@ using System.Collections.Generic;
 
 namespace cube_game
 {
-    public class CubePiece
-    {
-        private GraphicsDevice _graphicsDevice;
-        private VertexBuffer _vertexBuffer;
-        private IndexBuffer _indexBuffer;
-        private int _primitiveCount;
-
-        // 方块的当前世界矩阵（位置+旋转）
-        public Matrix World { get; set; }
-
-        // 原始位置（固定），用于旋转时参考
-        public Vector3 OriginalPosition { get; private set; }
-
-        // 当前的位置（包含旋转后的位置，但平移部分保持整数）
-        public Matrix OriginalMatrix { get; set; }
-
-        // 更新原始位置
-        public void UpdateOriginalPosition(Vector3 newPosition)
-        {
-            OriginalPosition = newPosition;
-        }
-
-        // 每个面的颜色（数组顺序：前、后、上、下、左、右）
-        private Color[] _faceColors;
-
-        public CubePiece(GraphicsDevice graphicsDevice, Vector3 position, Color[] faceColors)
-        {
-            _graphicsDevice = graphicsDevice;
-            OriginalPosition = position;
-            World = Matrix.CreateTranslation(position);
-            OriginalMatrix = World;
-            _faceColors = faceColors;
-
-            BuildCube();
-        }
-
-        private void BuildCube()
-        {
-            float size = 0.96f; // 方块大小
-            // 定义立方体的8个顶点（中心在原点），右手坐标系：Z轴正方向指向屏幕外
-            // 因此将原左手系的Z取反，使前面对应Z正
-            Vector3[] corners = new Vector3[]
-            {
-                new Vector3(-size/2, -size/2,  size/2), // 0: 前左下（原Z负变正）
-                new Vector3( size/2, -size/2,  size/2), // 1: 前右下
-                new Vector3( size/2,  size/2,  size/2), // 2: 前右上
-                new Vector3(-size/2,  size/2,  size/2), // 3: 前左上
-                new Vector3(-size/2, -size/2, -size/2), // 4: 后左下（原Z正变负）
-                new Vector3( size/2, -size/2, -size/2), // 5: 后右下
-                new Vector3( size/2,  size/2, -size/2), // 6: 后右上
-                new Vector3(-size/2,  size/2, -size/2)  // 7: 后左上
-            };
-
-            // 每个面对应的顶点索引（三角形带，共12个三角形，每个面2个三角形）
-            // 注意：右手系中正面为逆时针，此处顶点顺序仍为顺时针（原左手系习惯），
-            // 因此需要设置剔除模式为剔除顺时针（见Initialize），从而保留逆时针为正面
-            int[][] faceIndices = new int[][]
-            {
-                new int[] {0,1,2, 0,2,3}, // 前面 (Z正)
-                new int[] {4,6,5, 4,7,6}, // 后面 (Z负)
-                new int[] {3,2,6, 3,6,7}, // 上面 (Y正)
-                new int[] {0,5,1, 0,4,5}, // 下面 (Y负)
-                new int[] {1,5,6, 1,6,2}, // 右面 (X正)
-                new int[] {0,7,4, 0,3,7}  // 左面 (X负)
-            };
-
-            List<VertexPositionColor> vertices = new List<VertexPositionColor>();
-            List<ushort> indices = new List<ushort>();
-
-            // 为每个面生成顶点（每个面4个顶点，因为颜色不同，不能共享顶点）
-            for (int f = 0; f < 6; f++)
-            {
-                Color faceColor = _faceColors[f];
-                int[] faceTriangles = faceIndices[f];
-                // 每个面需要4个顶点（两个三角形共6个索引）
-                for (int i = 0; i < faceTriangles.Length; i++)
-                {
-                    int cornerIndex = faceTriangles[i];
-                    Vector3 pos = corners[cornerIndex];
-                    vertices.Add(new VertexPositionColor(pos, faceColor));
-                    indices.Add((ushort)(vertices.Count - 1));
-                }
-            }
-
-            _vertexBuffer = new VertexBuffer(_graphicsDevice, VertexPositionColor.VertexDeclaration, vertices.Count, BufferUsage.WriteOnly);
-            _vertexBuffer.SetData(vertices.ToArray());
-
-            _indexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits, indices.Count, BufferUsage.WriteOnly);
-            _indexBuffer.SetData(indices.ToArray());
-
-            _primitiveCount = indices.Count / 3;
-        }
-
-        public void Draw(BasicEffect effect)
-        {
-            _graphicsDevice.SetVertexBuffer(_vertexBuffer);
-            _graphicsDevice.Indices = _indexBuffer;
-            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _primitiveCount);
-        }
-    }
-
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
         private BasicEffect _effect;
         private Matrix _view;
         private Matrix _projection;
-        private List<CubePiece> _cubes; // 存储27个方块
+        private List<cube.CubePiece> _cubes; // 存储27个方块
         private float _timer = 0; // 计时器
         private float _rotationDuration = 0.5f; // 旋转持续时间（秒），旋转90度的时间
         private bool _isRotating = false; // 是否正在旋转
         private char _currentFace = ' '; // 当前要旋转的面，' '表示等待输入
         private string _cubeState = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // 魔方状态字符串
 
-        // 颜色映射：U=白, D=黄, F=红, B=橙, L=绿, R=蓝
-        private Color GetColorFromChar(char c)
-        {
-            switch (c)
-            {
-                case 'U': return Color.White;
-                case 'D': return Color.Yellow;
-                case 'F': return Color.Red;
-                case 'B': return Color.Orange;
-                case 'L': return Color.Green;
-                case 'R': return Color.Blue;
-                default: return Color.Black;
-            }
-        }
-
-        // 创建旋转矩阵（右手坐标系，所有方向取反以保持视觉一致）
-        private Matrix CreateRotationMatrix(char face, float angle)
-        {
-            switch (face)
-            {
-                case 'u': // 最上层面绕Y轴旋转
-                    return Matrix.CreateRotationY(-angle);
-                case 'd': // 最下层面绕Y轴旋转
-                    return Matrix.CreateRotationY(-angle);    
-                case 'l': // 最左层面绕X轴旋转
-                    return Matrix.CreateRotationX(angle);     
-                case 'r': // 最右层面绕X轴旋转
-                    return Matrix.CreateRotationX(-angle);      
-                case 'f': // 最前层面绕Z轴旋转
-                    return Matrix.CreateRotationZ(-angle);      
-                case 'b': // 最后层面绕Z轴旋转
-                    return Matrix.CreateRotationZ(angle);      
-                default:
-                    return Matrix.Identity;
-            }
-        }
-
         // 检查立方体是否需要旋转（基于原始逻辑位置，不受几何变换影响）
-        private bool ShouldRotateCube(CubePiece cube, char face)
+        private bool ShouldRotateCube(cube.CubePiece cube, char face)
         {
             switch (face)
             {
@@ -170,17 +32,17 @@ namespace cube_game
                     return Math.Abs(cube.OriginalMatrix.Translation.X - (-1)) < 0.001f;
                 case 'r': // 最右层面绕X轴旋转
                     return Math.Abs(cube.OriginalMatrix.Translation.X - 1) < 0.001f;
-                case 'f': // 最前层面绕Z轴旋转（逻辑前面对应Z = -1）
-                    return Math.Abs(cube.OriginalMatrix.Translation.Z - (-1)) < 0.001f;
-                case 'b': // 最后层面绕Z轴旋转（逻辑后面对应Z = 1）
+                case 'f': // 最前层面绕Z轴旋转（逻辑前面对应Z = 1）
                     return Math.Abs(cube.OriginalMatrix.Translation.Z - 1) < 0.001f;
+                case 'b': // 最后层面绕Z轴旋转（逻辑后面对应Z = -1）
+                    return Math.Abs(cube.OriginalMatrix.Translation.Z - (-1)) < 0.001f;
                 default:
                     return false;
             }
         }
 
         // 更新立方体矩阵，应用旋转并四舍五入位置
-        private void UpdateCubeMatrix(CubePiece cube, Matrix rotation)
+        private void UpdateCubeMatrix(cube.CubePiece cube, Matrix rotation)
         {
             Matrix transformedMatrix = cube.OriginalMatrix * rotation;
 
@@ -208,7 +70,7 @@ namespace cube_game
         // 完成旋转，更新所有立方体矩阵并重置状态
         private void CompleteRotation()
         {
-            Matrix finalRotation = CreateRotationMatrix(_currentFace, MathHelper.PiOver2);
+            Matrix finalRotation = tool.RotationHelper.CreateRotationMatrix(_currentFace, MathHelper.PiOver2);
 
             for (int i = 0; i < _cubes.Count; i++)
             {
@@ -242,20 +104,9 @@ namespace cube_game
             base.Initialize();
         }
 
-        protected override void LoadContent()
+        protected void createCubeByStage()
         {
-            _effect.VertexColorEnabled = true;
-            _effect.LightingEnabled = false;
-
-            _view = Matrix.CreateLookAt(new Vector3(4, 5, 8), Vector3.Zero, Vector3.Up);
-            _projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.PiOver4,
-                GraphicsDevice.Viewport.AspectRatio,
-                0.1f,
-                100f);
-
-            _cubes = new List<CubePiece>();
-
+            _cubes = new List<cube.CubePiece>();
             // 生成27个方块，位置从 -1 到 1，步长为1，形成3x3x3大立方体
             for (int x = -1; x <= 1; x++)
             {
@@ -269,15 +120,13 @@ namespace cube_game
                         Color[] faceColors = new Color[6];
                         
                         // 面索引：0=前(Z正), 1=后(Z负), 2=上(Y正), 3=下(Y负), 4=右(X正), 5=左(X负)
-                        // 注意：由于几何体Z取反，前后面颜色交换（原前面Z负变Z正，原后面Z正变Z负）
-                        
                         // 上面 (U): y=1，状态字符串位置0-8
                         if (y == 1)
                         {
                             int row = 1 - z; // z=-1→row=2, z=0→row=1, z=1→row=0
                             int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
                             int index = row * 3 + col;
-                            faceColors[2] = GetColorFromChar(_cubeState[index]);
+                            faceColors[2] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
@@ -290,7 +139,7 @@ namespace cube_game
                             int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
                             int col = z + 1; // z=-1→col=0, z=0→col=1, z=1→col=2
                             int index = 9 + row * 3 + col;
-                            faceColors[4] = GetColorFromChar(_cubeState[index]);
+                            faceColors[4] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
@@ -305,7 +154,7 @@ namespace cube_game
                             int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
                             int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
                             int index = 18 + row * 3 + col; // 前面状态字符串
-                            faceColors[0] = GetColorFromChar(_cubeState[index]);
+                            faceColors[0] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
@@ -318,7 +167,7 @@ namespace cube_game
                             int row = z + 1; // z=-1→row=0, z=0→row=1, z=1→row=2
                             int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
                             int index = 27 + row * 3 + col;
-                            faceColors[3] = GetColorFromChar(_cubeState[index]);
+                            faceColors[3] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
@@ -331,7 +180,7 @@ namespace cube_game
                             int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
                             int col = 1 - z; // z=-1→col=2, z=0→col=1, z=1→col=0 (镜像)
                             int index = 36 + row * 3 + col;
-                            faceColors[5] = GetColorFromChar(_cubeState[index]);
+                            faceColors[5] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
@@ -344,17 +193,32 @@ namespace cube_game
                             int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
                             int col = 1 - x; // x=-1→col=2, x=0→col=1, x=1→col=0 (镜像)
                             int index = 45 + row * 3 + col; // 后面状态字符串
-                            faceColors[1] = GetColorFromChar(_cubeState[index]);
+                            faceColors[1] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
                             faceColors[1] = Color.Black;
                         }
 
-                        _cubes.Add(new CubePiece(GraphicsDevice, pos, faceColors));
+                        _cubes.Add(new cube.CubePiece(GraphicsDevice, pos, faceColors));
                     }
                 }
             }
+        }
+
+        protected override void LoadContent()
+        {
+            _effect.VertexColorEnabled = true;
+            _effect.LightingEnabled = false;
+
+            _view = Matrix.CreateLookAt(new Vector3(4, 5, 8), Vector3.Zero, Vector3.Up);
+            _projection = Matrix.CreatePerspectiveFieldOfView(
+                MathHelper.PiOver4,
+                GraphicsDevice.Viewport.AspectRatio,
+                0.1f,
+                100f);
+
+            createCubeByStage();
         }
 
         protected override void Update(GameTime gameTime)
@@ -399,7 +263,7 @@ namespace cube_game
                 float currentRotation = rotationProgress * MathHelper.PiOver2;
 
                 // 创建旋转矩阵
-                Matrix rotation = CreateRotationMatrix(_currentFace, currentRotation);
+                Matrix rotation = tool.RotationHelper.CreateRotationMatrix(_currentFace, currentRotation);
 
                 // 更新每个小立方体的世界矩阵
                 foreach (var cube in _cubes)
