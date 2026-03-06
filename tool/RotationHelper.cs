@@ -1,0 +1,129 @@
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.Xna.Framework;
+
+
+namespace tool
+{
+    public class RotationHelper
+    {
+        // 面标识符常量
+        public const char FACE_UP = 'U';
+        public const char FACE_DOWN = 'D';
+        public const char FACE_LEFT = 'L';
+        public const char FACE_RIGHT = 'R';
+        public const char FACE_FRONT = 'F';
+        public const char FACE_BACK = 'B';
+
+        // 旋转指令字符串常量
+        public const string CMD_UP = "U";
+        public const string CMD_UP_PRIME = "U'";
+        public const string CMD_DOWN = "D";
+        public const string CMD_DOWN_PRIME = "D'";
+        public const string CMD_LEFT = "L";
+        public const string CMD_LEFT_PRIME = "L'";
+        public const string CMD_RIGHT = "R";
+        public const string CMD_RIGHT_PRIME = "R'";
+        public const string CMD_FRONT = "F";
+        public const string CMD_FRONT_PRIME = "F'";
+        public const string CMD_BACK = "B";
+        public const string CMD_BACK_PRIME = "B'";
+        public const string CMD_UP_2 = "U2";
+        public const string CMD_DOWN_2 = "D2";
+        public const string CMD_LEFT_2 = "L2";
+        public const string CMD_RIGHT_2 = "R2";
+        public const string CMD_FRONT_2 = "F2";
+        public const string CMD_BACK_2 = "B2";
+
+        // 创建旋转矩阵
+        public static Matrix CreateRotationMatrix(char face, float angle)
+        {
+            switch (face)
+            {
+                case FACE_UP: // 最上层面绕Y轴旋转
+                    return Matrix.CreateRotationY(-angle);
+                case FACE_DOWN: // 最下层面绕Y轴旋转
+                    return Matrix.CreateRotationY(angle);
+                case FACE_LEFT: // 最左层面绕X轴旋转
+                    return Matrix.CreateRotationX(angle);
+                case FACE_RIGHT: // 最右层面绕X轴旋转
+                    return Matrix.CreateRotationX(-angle);
+                case FACE_FRONT: // 最前层面绕Z轴旋转
+                    return Matrix.CreateRotationZ(-angle);
+                case FACE_BACK: // 最后层面绕Z轴旋转
+                    return Matrix.CreateRotationZ(angle);
+                default:
+                    return Matrix.Identity;
+            }
+        }
+
+
+        public static float GetRotationAngle(string cmd)
+        {
+            switch (cmd)
+            {
+                case CMD_UP: // 最上层面绕Y轴旋转
+                    return -MathHelper.PiOver2;
+                case CMD_UP_PRIME: // 最上层面绕Y轴旋转
+                    return MathHelper.PiOver2;
+                case CMD_DOWN: // 最下层面绕Y轴旋转
+                    return MathHelper.PiOver2;
+                case CMD_DOWN_PRIME: // 最下层面绕Y轴旋转
+                    return -MathHelper.PiOver2;
+                case CMD_LEFT: // 最左层面绕X轴旋转
+                    return MathHelper.PiOver2;
+                case CMD_LEFT_PRIME: // 最左层面绕X轴旋转
+                    return -MathHelper.PiOver2;
+                case CMD_RIGHT: // 最右层面绕X轴旋转
+                    return -MathHelper.PiOver2;
+                case CMD_RIGHT_PRIME: // 最右层面绕X轴旋转
+                    return MathHelper.PiOver2;
+                case CMD_FRONT: // 最前层面绕Z轴旋转
+                    return -MathHelper.PiOver2;
+                case CMD_FRONT_PRIME: // 最前层面绕Z轴旋转
+                    return MathHelper.PiOver2;
+                case CMD_BACK: // 最后层面绕Z轴旋转
+                    return MathHelper.PiOver2;
+                case CMD_BACK_PRIME: // 最后层面绕Z轴旋转
+                    return -MathHelper.PiOver2;
+                case CMD_UP_2: // 最上层面绕Y轴旋转
+                    return -MathHelper.Pi;
+                case CMD_DOWN_2: // 最下层面绕Y轴旋转
+                    return MathHelper.Pi;
+                case CMD_LEFT_2: // 最左层面绕X轴旋转
+                    return MathHelper.Pi;
+                case CMD_RIGHT_2: // 最右层面绕X轴旋转
+                    return -MathHelper.Pi;
+                case CMD_FRONT_2: // 最前层面绕Z轴旋转
+                    return -MathHelper.Pi;
+                case CMD_BACK_2: // 最后层面绕Z轴旋转
+                    return MathHelper.Pi;
+                default:
+                    return 0;
+            }
+        }
+
+
+        public static Matrix CreateRotationMatrix(string face, float angle)
+        {
+            switch (face)
+            {
+                case CMD_UP: // 最上层面绕Y轴旋转
+                    return Matrix.CreateRotationY(-angle);
+                case CMD_DOWN: // 最下层面绕Y轴旋转
+                    return Matrix.CreateRotationY(angle);
+                case CMD_LEFT: // 最左层面绕X轴旋转
+                    return Matrix.CreateRotationX(angle);
+                case CMD_RIGHT: // 最右层面绕X轴旋转
+                    return Matrix.CreateRotationX(-angle);
+                case CMD_FRONT: // 最前层面绕Z轴旋转
+                    return Matrix.CreateRotationZ(-angle);
+                case CMD_BACK: // 最后层面绕Z轴旋转
+                    return Matrix.CreateRotationZ(angle);
+                default:
+                    return Matrix.Identity;
+            }
+        }
+
+
+    }
+}

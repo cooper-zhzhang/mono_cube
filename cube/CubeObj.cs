@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -5,14 +6,8 @@ using System;
 using System.Collections.Generic;
 using tool;
 
-namespace cube
+namespace cube_obj
 {
-
-    enum CubeFace
-    {
-        Front, Back, Up, Down, Left, Right
-    }
-
     enum PlayType
     {
         Free,
@@ -122,6 +117,9 @@ namespace cube
 
     public class Cube
     {
+
+
+        private scene.BaseScene _baseScene;
         private PlayType _playType = PlayType.Free;
         private GraphicsDevice _graphicsDevice;
         private List<CubePiece> _cubes; // 存储27个方块
@@ -140,7 +138,7 @@ namespace cube
             _cubeState = cubeState;
         }
 
-        private bool ShouldRotateCube(cube.CubePiece cube, string face)
+        private bool ShouldRotateCube(cube_obj.CubePiece cube, string face)
         {
             switch (face)
             {
@@ -175,7 +173,7 @@ namespace cube
 
 
         // 完成一次旋转后整体更新每个小立方体的矩阵
-        private void UpdateCubeMatrix(cube.CubePiece cube, Matrix rotation)
+        private void UpdateCubeMatrix(cube_obj.CubePiece cube, Matrix rotation)
         {
             Matrix transformedMatrix = cube.OriginalMatrix * rotation;
 
@@ -200,7 +198,7 @@ namespace cube
             cube.World = finalMatrix;
         }
 
-        protected void createCubeByStage()
+        public void createCubeByStage()
         {
 
             _cubes = new List<CubePiece>();
@@ -329,14 +327,7 @@ namespace cube
                 // 更新每个小立方体的世界矩阵
                 foreach (var cube in _cubes)
                 {
-                    if (ShouldRotateCube(cube, _currentFace))
-                    {
-                        cube.World = cube.OriginalMatrix * rotation;
-                    }
-                    else
-                    {
-                        cube.World = cube.OriginalMatrix;
-                    }
+                    cube.World  = ShouldRotateCube(cube, _currentFace)?cube.OriginalMatrix * rotation : cube.OriginalMatrix;
                 }
 
                 // 旋转完成
@@ -347,6 +338,23 @@ namespace cube
             }
         }
 
+        public void Draw(GameTime gameTime)
+        {
+            BasicEffect effect = _baseScene._effect;
+            effect.View = _baseScene._view;
+            effect.Projection = _baseScene._projection;
+
+            // 遍历所有方块进行绘制
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                foreach (var cube in _cubes)
+                {
+                    effect.World = cube.World;
+                    pass.Apply();
+                    cube.Draw(effect);
+                }
+            }
+        }
         public void Update(GameTime gameTime)
         {
             // 计时器累加
@@ -358,17 +366,17 @@ namespace cube
             {
                 var keyboardState = Keyboard.GetState();
                 if (keyboardState.IsKeyDown(Keys.U))
-                    currentFace = "u'";
+                    currentFace = tool.RotationHelper.CMD_UP;
                 else if (keyboardState.IsKeyDown(Keys.D))
-                    currentFace = "d";
+                    currentFace = tool.RotationHelper.CMD_DOWN;
                 else if (keyboardState.IsKeyDown(Keys.L))
-                    currentFace = "l";
+                    currentFace = tool.RotationHelper.CMD_LEFT;
                 else if (keyboardState.IsKeyDown(Keys.R))
-                    currentFace = "r";
+                    currentFace = tool.RotationHelper.CMD_RIGHT;
                 else if (keyboardState.IsKeyDown(Keys.F))
-                    currentFace = "f";
+                    currentFace = tool.RotationHelper.CMD_FRONT;
                 else if (keyboardState.IsKeyDown(Keys.B))
-                    currentFace = "b";
+                    currentFace = tool.RotationHelper.CMD_BACK;
             }
 
             RotationByFace(currentFace);
@@ -377,13 +385,11 @@ namespace cube
         private void CompleteRotation()
         {
             Matrix finalRotation = tool.RotationHelper.CreateRotationMatrix(_currentFace, MathHelper.PiOver2);
-
             for (int i = 0; i < _cubes.Count; i++)
             {
-                var cube = _cubes[i];
-                if (ShouldRotateCube(cube, _currentFace))
+                if (ShouldRotateCube(_cubes[i], _currentFace))
                 {
-                    UpdateCubeMatrix(cube, finalRotation);
+                    UpdateCubeMatrix(_cubes[i], finalRotation);
                 }
             }
 
@@ -391,11 +397,5 @@ namespace cube
             __rotatingTimer = 0;
             _currentFace = ""; // 重置为等待输入状态
         }
-
-
-
-
-
     }
-
 }

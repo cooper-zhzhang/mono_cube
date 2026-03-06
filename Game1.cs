@@ -8,11 +8,12 @@ namespace cube_game
 {
     public class Game1 : Game
     {
+        //scene.FreeCubeScene _freeCubeScene;
         private GraphicsDeviceManager _graphics;
         private BasicEffect _effect;
         private Matrix _view;
         private Matrix _projection;
-        private List<cube.CubePiece> _cubes; // 存储27个方块
+        private List<cube_obj.CubePiece> _cubes; // 存储27个方块
         private float _timer = 0; // 计时器
         private float _rotationDuration = 0.5f; // 旋转持续时间（秒），旋转90度的时间
         private bool _isRotating = false; // 是否正在旋转
@@ -20,7 +21,7 @@ namespace cube_game
         private string _cubeState = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // 魔方状态字符串
 
         // 检查立方体是否需要旋转（基于原始逻辑位置，不受几何变换影响）
-        private bool ShouldRotateCube(cube.CubePiece cube, char face)
+        private bool ShouldRotateCube(cube_obj.CubePiece cube, char face)
         {
             switch (face)
             {
@@ -42,7 +43,7 @@ namespace cube_game
         }
 
         // 更新立方体矩阵，应用旋转并四舍五入位置
-        private void UpdateCubeMatrix(cube.CubePiece cube, Matrix rotation)
+        private void UpdateCubeMatrix(cube_obj.CubePiece cube, Matrix rotation)
         {
             Matrix transformedMatrix = cube.OriginalMatrix * rotation;
 
@@ -88,6 +89,7 @@ namespace cube_game
 
         public Game1()
         {
+            
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -106,7 +108,7 @@ namespace cube_game
 
         protected void createCubeByStage()
         {
-            _cubes = new List<cube.CubePiece>();
+            _cubes = new List<cube_obj.CubePiece>();
             // 生成27个方块，位置从 -1 到 1，步长为1，形成3x3x3大立方体
             for (int x = -1; x <= 1; x++)
             {
@@ -200,7 +202,7 @@ namespace cube_game
                             faceColors[1] = Color.Black;
                         }
 
-                        _cubes.Add(new cube.CubePiece(GraphicsDevice, pos, faceColors));
+                        _cubes.Add(new cube_obj.CubePiece(GraphicsDevice, pos, faceColors));
                     }
                 }
             }
@@ -219,10 +221,15 @@ namespace cube_game
                 100f);
 
             createCubeByStage();
+            // _freeCubeScene = new scene.FreeCubeScene(_graphics, _view, _projection);
+            // _freeCubeScene .Initialize();
+            // _freeCubeScene .LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
         {
+            //_freeCubeScene.Update(gameTime);
+
             // 退出条件（按ESC或手柄返回键）
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -293,6 +300,8 @@ namespace cube_game
 
         protected override void Draw(GameTime gameTime)
         {
+            //_freeCubeScene.Draw(gameTime);
+
             GraphicsDevice.Clear(Color.Gray);
 
             _effect.View = _view;
