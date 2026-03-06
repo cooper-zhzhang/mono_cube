@@ -1,19 +1,11 @@
-using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using tool;
+
 
 namespace cube_obj
 {
-    enum PlayType
-    {
-        Free,
-        Solved
-    }
-
     public class CubePiece
     {
         private GraphicsDevice _graphicsDevice;
@@ -118,53 +110,73 @@ namespace cube_obj
     public class Cube
     {
 
-
         private scene.BaseScene _baseScene;
-        private PlayType _playType = PlayType.Free;
         private GraphicsDevice _graphicsDevice;
         private List<CubePiece> _cubes; // 存储27个方块
         private float _rotationDuration = 0.5f; // 旋转持续时间（秒），旋转90度的时间
         
         private float _speed = MathHelper.PiOver2; // 旋转速度 弧度/秒
         private bool _isRotating = false; // 是否正在旋转
-        private string _currentFace = ""; // 当前要旋转的面
+        private string _currentCmd = ""; // 当前要旋转的命令
         private float __rotatingTimer = 0; // 旋转时间
 
         private string _cubeState = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // 魔方状态字符串
 
-        public Cube(GraphicsDevice graphicsDevice, string cubeState)
+
+        public bool CanInputCmd()
         {
+            if (_isRotating)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void InputCmd(string cmd)
+        {
+            if (!CanInputCmd())
+            {
+                return;
+            }
+
+            _currentCmd = cmd;
+        }
+
+        public Cube(GraphicsDevice graphicsDevice, string cubeState, scene.BaseScene baseScene)
+        {
+            _baseScene = baseScene;
             _graphicsDevice = graphicsDevice;
             _cubeState = cubeState;
         }
 
-        private bool ShouldRotateCube(cube_obj.CubePiece cube, string face)
+        private bool ShouldRotateCube(cube_obj.CubePiece cube, string cmd)
         {
-            switch (face)
+            switch (cmd)
             {
-                case "u": // 最上层面绕Y轴旋转
-                case "u2":
-                case "u'":
+                case tool.RotationHelper.CMD_UP: // 最上层面绕Y轴旋转
+                case tool.RotationHelper.CMD_UP_2:
+                case tool.RotationHelper.CMD_UP_PRIME:
                     return Math.Abs(cube.OriginalMatrix.Translation.Y - 1) < 0.001f;
-                case "d": // 最下层面绕Y轴旋转
-                case "d2":
-                case "d'":
+                case tool.RotationHelper.CMD_DOWN: // 最下层面绕Y轴旋转
+                case tool.RotationHelper.CMD_DOWN_2:
+                case tool.RotationHelper.CMD_DOWN_PRIME:
                     return Math.Abs(cube.OriginalMatrix.Translation.Y - (-1)) < 0.001f;
-                case "l": // 最左层面绕X轴旋转
-                case "l2":
-                case "l'":
+                case tool.RotationHelper.CMD_LEFT: // 最左层面绕X轴旋转
+                case tool.RotationHelper.CMD_LEFT_2:
+                case tool.RotationHelper.CMD_LEFT_PRIME:
                     return Math.Abs(cube.OriginalMatrix.Translation.X - (-1)) < 0.001f;
-                case "r": // 最右层面绕X轴旋转
-                case "r2":
-                case "r'":
+                case tool.RotationHelper.CMD_RIGHT: // 最右层面绕X轴旋转
+                case tool.RotationHelper.CMD_RIGHT_2:
+                case tool.RotationHelper.CMD_RIGHT_PRIME:
                     return Math.Abs(cube.OriginalMatrix.Translation.X - 1) < 0.001f;
-                case "f": // 最前层面绕Z轴旋转（逻辑前面对应Z = 1）
-                case "f2":
-                case "f'":
+                case tool.RotationHelper.CMD_FRONT: // 最前层面绕Z轴旋转（逻辑前面对应Z = 1）
+                case tool.RotationHelper.CMD_FRONT_2:
+                case tool.RotationHelper.CMD_FRONT_PRIME:
                     return Math.Abs(cube.OriginalMatrix.Translation.Z - 1) < 0.001f;
-                case "b": // 最后层面绕Z轴旋转（逻辑后面对应Z = -1）
-                case "b2":
-                case "b'":
+                case tool.RotationHelper.CMD_BACK: // 最后层面绕Z轴旋转（逻辑后面对应Z = -1）
+                case tool.RotationHelper.CMD_BACK_2:
+                case tool.RotationHelper.CMD_BACK_PRIME:
                     return Math.Abs(cube.OriginalMatrix.Translation.Z - (-1)) < 0.001f;
                 default:
                     return false;
@@ -303,13 +315,13 @@ namespace cube_obj
         }
 
         // 按照指令进行旋转
-        protected void RotationByFace(string face)
+        protected void RotationByCmd(string cmd)
         {
-            if(_currentFace == ""){
-                _currentFace = face;
+            if(_currentCmd == ""){
+                _currentCmd = cmd;
             }
 
-            if (!_isRotating && _currentFace != "")
+            if (!_isRotating && _currentCmd != "")
             {
                 // 开始旋转
                 _isRotating = true;
@@ -317,17 +329,18 @@ namespace cube_obj
             }
             else if (_isRotating)
             {
-                float angle = tool.RotationHelper.GetRotationAngle(_currentFace);
+                float angle = tool.RotationHelper.GetRotationAngle(_currentCmd);
                 // 正在旋转：根据_speed（弧度/秒）计算旋转角度
                 float currentRotation = __rotatingTimer * _speed;
-                float rotationProgress = Math.Min(1.0f, currentRotation / angle);
+                float rotationProgress = Math.Min(1.0f, Math.Abs (currentRotation / angle));
+
                 // 创建旋转矩阵
-                Matrix rotation = tool.RotationHelper.CreateRotationMatrix(_currentFace, currentRotation);
+                Matrix rotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, currentRotation);
 
                 // 更新每个小立方体的世界矩阵
                 foreach (var cube in _cubes)
                 {
-                    cube.World  = ShouldRotateCube(cube, _currentFace)?cube.OriginalMatrix * rotation : cube.OriginalMatrix;
+                    cube.World  = ShouldRotateCube(cube, _currentCmd)?cube.OriginalMatrix * rotation : cube.OriginalMatrix;
                 }
 
                 // 旋转完成
@@ -357,37 +370,16 @@ namespace cube_obj
         }
         public void Update(GameTime gameTime)
         {
-            // 计时器累加
             __rotatingTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            string currentFace = "";
-            // 检测键盘输入（只在等待输入状态时检测）
-            if (!_isRotating && _currentFace == "")
-            {
-                var keyboardState = Keyboard.GetState();
-                if (keyboardState.IsKeyDown(Keys.U))
-                    currentFace = tool.RotationHelper.CMD_UP;
-                else if (keyboardState.IsKeyDown(Keys.D))
-                    currentFace = tool.RotationHelper.CMD_DOWN;
-                else if (keyboardState.IsKeyDown(Keys.L))
-                    currentFace = tool.RotationHelper.CMD_LEFT;
-                else if (keyboardState.IsKeyDown(Keys.R))
-                    currentFace = tool.RotationHelper.CMD_RIGHT;
-                else if (keyboardState.IsKeyDown(Keys.F))
-                    currentFace = tool.RotationHelper.CMD_FRONT;
-                else if (keyboardState.IsKeyDown(Keys.B))
-                    currentFace = tool.RotationHelper.CMD_BACK;
-            }
-
-            RotationByFace(currentFace);
+            RotationByCmd("");
         }
 
         private void CompleteRotation()
         {
-            Matrix finalRotation = tool.RotationHelper.CreateRotationMatrix(_currentFace, MathHelper.PiOver2);
+            Matrix finalRotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, MathHelper.PiOver2);
             for (int i = 0; i < _cubes.Count; i++)
             {
-                if (ShouldRotateCube(_cubes[i], _currentFace))
+                if (ShouldRotateCube(_cubes[i], _currentCmd))
                 {
                     UpdateCubeMatrix(_cubes[i], finalRotation);
                 }
@@ -395,7 +387,7 @@ namespace cube_obj
 
             _isRotating = false;
             __rotatingTimer = 0;
-            _currentFace = ""; // 重置为等待输入状态
+            _currentCmd = ""; // 重置为等待输入状态
         }
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace scene
 {
@@ -11,7 +11,7 @@ namespace scene
         // 每个对象继承 obj 类，包含位置、旋转、缩放、颜色等属性。
         public FreeCubeScene(GraphicsDeviceManager graphics, Matrix _view, Matrix _projection) : base(graphics, _view, _projection)
         {
-            _cube = new cube_obj.Cube(_graphics.GraphicsDevice, "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB");
+            _cube = new cube_obj.Cube(_graphics.GraphicsDevice, "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB", this);
             _cube.createCubeByStage();
 
         }
@@ -32,6 +32,27 @@ namespace scene
 
         public override void Update(GameTime gameTime)
         {
+            string currentCmd = "";
+            if (_cube.CanInputCmd()){
+                 var keyboardState = Keyboard.GetState();
+                if (keyboardState.IsKeyDown(Keys.U))
+                    currentCmd = tool.RotationHelper.CMD_UP;
+                else if (keyboardState.IsKeyDown(Keys.D))
+                    currentCmd = tool.RotationHelper.CMD_DOWN;
+                else if (keyboardState.IsKeyDown(Keys.L))
+                    currentCmd = tool.RotationHelper.CMD_LEFT;
+                else if (keyboardState.IsKeyDown(Keys.R))
+                    currentCmd = tool.RotationHelper.CMD_RIGHT;
+                else if (keyboardState.IsKeyDown(Keys.F))
+                    currentCmd = tool.RotationHelper.CMD_FRONT;
+                else if (keyboardState.IsKeyDown(Keys.B))
+                    currentCmd = tool.RotationHelper.CMD_BACK;
+            }
+
+            if (currentCmd != ""){
+                _cube.InputCmd(currentCmd);
+            }
+
             _cube.Update(gameTime);
             base.Update(gameTime);
         }
@@ -42,7 +63,7 @@ namespace scene
             _effect.VertexColorEnabled = true;
             _effect.LightingEnabled = false;
 
-            _view = Matrix.CreateLookAt(new Vector3(4, 5, 8), Vector3.Zero, Vector3.Up);
+            _view = Matrix.CreateLookAt(new Vector3(6, 4, 6), Vector3.Zero, Vector3.Up);
             _projection = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.PiOver4,
                 _graphics.GraphicsDevice.Viewport.AspectRatio,
