@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -27,7 +28,6 @@ namespace scene
 
         public virtual void Update(GameTime gameTime)
         {
-
         }
         public virtual void Draw(GameTime gameTime)
         {

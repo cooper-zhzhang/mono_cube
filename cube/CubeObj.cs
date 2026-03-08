@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Kociemba;
 
 
 namespace cube_obj
@@ -113,14 +114,14 @@ namespace cube_obj
         private scene.BaseScene _baseScene;
         private GraphicsDevice _graphicsDevice;
         private List<CubePiece> _cubes; // 存储27个方块
-        private float _rotationDuration = 0.5f; // 旋转持续时间（秒），旋转90度的时间
-        
+
         private float _speed = MathHelper.PiOver2; // 旋转速度 弧度/秒
         private bool _isRotating = false; // 是否正在旋转
         private string _currentCmd = ""; // 当前要旋转的命令
         private float __rotatingTimer = 0; // 旋转时间
 
         private string _cubeState = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // 魔方状态字符串
+        private string _sloveState;
 
 
         public bool CanInputCmd()
@@ -133,14 +134,15 @@ namespace cube_obj
             return true;
         }
 
-        public void InputCmd(string cmd)
+        public bool InputCmd(string cmd)
         {
             if (!CanInputCmd())
             {
-                return;
+                return false;
             }
 
             _currentCmd = cmd;
+            return true;
         }
 
         public Cube(GraphicsDevice graphicsDevice, string cubeState, scene.BaseScene baseScene)
@@ -148,6 +150,21 @@ namespace cube_obj
             _baseScene = baseScene;
             _graphicsDevice = graphicsDevice;
             _cubeState = cubeState;
+            Console.WriteLine("Cube {0}", _cubeState);
+        }
+
+
+        public string SloveCube()
+        {
+            Console.WriteLine("SloveCube {0}", _cubeState);
+            string facelets = _cubeState;
+            string info;
+            string solution = SearchRunTime.solution(facelets, out info, maxDepth: 22, timeOut: 6000, useSeparator: false);
+
+            // TODO: 做成异步 设置解决中状态
+            _sloveState = solution;
+
+            return solution;
         }
 
         private bool ShouldRotateCube(cube_obj.CubePiece cube, string cmd)
@@ -231,7 +248,7 @@ namespace cube_obj
                         // 上面 (U): y=1，状态字符串位置0-8
                         if (y == 1)
                         {
-                            int row = 1 - z; // z=-1→row=2, z=0→row=1, z=1→row=0
+                            int row = 1 + z; // z=-1→row=2, z=0→row=1, z=1→row=0
                             int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
                             int index = row * 3 + col;
                             faceColors[2] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
@@ -245,7 +262,7 @@ namespace cube_obj
                         if (x == 1)
                         {
                             int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
-                            int col = z + 1; // z=-1→col=0, z=0→col=1, z=1→col=2
+                            int col = 1 - z; // z=-1→col=0, z=0→col=1, z=1→col=2
                             int index = 9 + row * 3 + col;
                             faceColors[4] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
@@ -272,7 +289,7 @@ namespace cube_obj
                         // 下面 (D): y=-1，状态字符串位置27-35
                         if (y == -1)
                         {
-                            int row = z + 1; // z=-1→row=0, z=0→row=1, z=1→row=2
+                            int row = 1 - z; // z=-1→row=0, z=0→row=1, z=1→row=2
                             int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
                             int index = 27 + row * 3 + col;
                             faceColors[3] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
@@ -286,7 +303,7 @@ namespace cube_obj
                         if (x == -1)
                         {
                             int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
-                            int col = 1 - z; // z=-1→col=2, z=0→col=1, z=1→col=0 (镜像)
+                            int col = 1 + z; // z=-1→col=2, z=0→col=1, z=1→col=0 (镜像)
                             int index = 36 + row * 3 + col;
                             faceColors[5] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
@@ -317,22 +334,25 @@ namespace cube_obj
         // 按照指令进行旋转
         protected void RotationByCmd(string cmd)
         {
-            if(_currentCmd == ""){
+            if (_currentCmd == "")
+            {
                 _currentCmd = cmd;
             }
 
             if (!_isRotating && _currentCmd != "")
             {
+                // Console.WriteLine("!_isRotating && _currentCmd != ");
                 // 开始旋转
                 _isRotating = true;
                 __rotatingTimer = 0;
             }
             else if (_isRotating)
             {
-                float angle = tool.RotationHelper.GetRotationAngle(_currentCmd);
+
+                float angle = tool.RotationHelper.GetRotationAngle(_currentCmd);// 
                 // 正在旋转：根据_speed（弧度/秒）计算旋转角度
                 float currentRotation = __rotatingTimer * _speed;
-                float rotationProgress = Math.Min(1.0f, Math.Abs (currentRotation / angle));
+                float rotationProgress = Math.Min(1.0f, Math.Abs(currentRotation / angle));
 
                 // 创建旋转矩阵
                 Matrix rotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, currentRotation);
@@ -340,7 +360,7 @@ namespace cube_obj
                 // 更新每个小立方体的世界矩阵
                 foreach (var cube in _cubes)
                 {
-                    cube.World  = ShouldRotateCube(cube, _currentCmd)?cube.OriginalMatrix * rotation : cube.OriginalMatrix;
+                    cube.World = ShouldRotateCube(cube, _currentCmd) ? cube.OriginalMatrix * rotation : cube.OriginalMatrix;
                 }
 
                 // 旋转完成
@@ -376,7 +396,7 @@ namespace cube_obj
 
         private void CompleteRotation()
         {
-            Matrix finalRotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, MathHelper.PiOver2);
+            Matrix finalRotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, Math.Abs(tool.RotationHelper.GetRotationAngle(_currentCmd)));
             for (int i = 0; i < _cubes.Count; i++)
             {
                 if (ShouldRotateCube(_cubes[i], _currentCmd))

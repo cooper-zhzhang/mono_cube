@@ -1,4 +1,5 @@
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
 using Microsoft.Xna.Framework;
 
 
@@ -56,7 +57,7 @@ namespace tool
             }
         }
 
-
+// 正值表示顺时针，负值表示逆时针
         public static float GetRotationAngle(string cmd)
         {
             switch (cmd)
@@ -108,17 +109,35 @@ namespace tool
             switch (face)
             {
                 case CMD_UP: // 最上层面绕Y轴旋转
+                case CMD_UP_2:
                     return Matrix.CreateRotationY(-angle);
-                case CMD_DOWN: // 最下层面绕Y轴旋转
+                case CMD_UP_PRIME: // 最上层面绕Y轴旋转
                     return Matrix.CreateRotationY(angle);
+                case CMD_DOWN: // 最下层面绕Y轴旋转
+                case CMD_DOWN_2:
+                    return Matrix.CreateRotationY(angle);
+                case CMD_DOWN_PRIME:
+                    return Matrix.CreateRotationY(-angle);
                 case CMD_LEFT: // 最左层面绕X轴旋转
+                case CMD_LEFT_2:
                     return Matrix.CreateRotationX(angle);
-                case CMD_RIGHT: // 最右层面绕X轴旋转
+                case CMD_LEFT_PRIME:
                     return Matrix.CreateRotationX(-angle);
+                case CMD_RIGHT: // 最右层面绕X轴旋转
+                case CMD_RIGHT_2:
+                    return Matrix.CreateRotationX(-angle);
+                case CMD_RIGHT_PRIME: // 最右层面绕X轴旋转
+                    return Matrix.CreateRotationX(angle);
                 case CMD_FRONT: // 最前层面绕Z轴旋转
+                case CMD_FRONT_2:
                     return Matrix.CreateRotationZ(-angle);
-                case CMD_BACK: // 最后层面绕Z轴旋转
+                case CMD_FRONT_PRIME: // 最前层面绕Z轴旋转
                     return Matrix.CreateRotationZ(angle);
+                case CMD_BACK: // 最后层面绕Z轴旋转
+                case CMD_BACK_2:
+                    return Matrix.CreateRotationZ(angle);
+                case CMD_BACK_PRIME: // 最后层面绕Z轴旋转
+                    return Matrix.CreateRotationZ(-angle);
                 default:
                     return Matrix.Identity;
             }

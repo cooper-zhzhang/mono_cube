@@ -1,12 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace cube_game
 {
     public class Game1 : Game
     {
-        scene.FreeCubeScene _freeCubeScene;
+        scene.SloveCubeScene _freeCubeScene;
         private GraphicsDeviceManager _graphics;
         private BasicEffect _effect;
         private Matrix _view;
@@ -44,7 +45,7 @@ namespace cube_game
                 0.1f,
                 100f);
 
-            _freeCubeScene = new scene.FreeCubeScene(_graphics, _view, _projection);
+            _freeCubeScene = new scene.SloveCubeScene(_graphics, _view, _projection);
             _freeCubeScene .Initialize();
             _freeCubeScene .LoadContent();
         }
@@ -55,7 +56,6 @@ namespace cube_game
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
             _freeCubeScene.Update(gameTime);
 
             base.Update(gameTime);

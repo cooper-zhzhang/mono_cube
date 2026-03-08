@@ -11,7 +11,7 @@ namespace scene
         // 每个对象继承 obj 类，包含位置、旋转、缩放、颜色等属性。
         public FreeCubeScene(GraphicsDeviceManager graphics, Matrix _view, Matrix _projection) : base(graphics, _view, _projection)
         {
-            _cube = new cube_obj.Cube(_graphics.GraphicsDevice, "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB", this);
+            _cube = new cube_obj.Cube(_graphics.GraphicsDevice, "UUUUUULLLURRURRURRFFFFFFFFFRRRDDDDDDLLDLLDLLDBBBBBBBBB", this);
             _cube.createCubeByStage();
 
         }
