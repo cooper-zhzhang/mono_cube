@@ -43,6 +43,94 @@ namespace cube_obj
             BuildPiece();
         }
 
+        public string CubeState()
+        {
+            // 面的原始顺序：前(0)、后(1)、上(2)、下(3)、右(4)、左(5)
+            // 根据 OriginalMatrix 的旋转，确定每个原始面现在朝向哪个方向
+            // 返回顺序：前、后、上、下、左、右
+            
+            char[] result = new char[6];
+            
+            // 从 OriginalMatrix 提取旋转信息
+            // 在右手坐标系中，Z轴正方向指向屏幕外（前面）
+            Vector3 originalFront = new Vector3(0, 0, 1);   // 原始前面方向
+            Vector3 originalBack = new Vector3(0, 0, -1);   // 原始后面方向
+            Vector3 originalUp = new Vector3(0, 1, 0);      // 原始上面方向
+            Vector3 originalDown = new Vector3(0, -1, 0);   // 原始下面方向
+            Vector3 originalRight = new Vector3(1, 0, 0);   // 原始右面方向
+            Vector3 originalLeft = new Vector3(-1, 0, 0);   // 原始左面方向
+            
+            // 应用旋转矩阵，获取旋转后的方向
+            Vector3 rotatedFront = Vector3.TransformNormal(originalFront, OriginalMatrix);
+            Vector3 rotatedBack = Vector3.TransformNormal(originalBack, OriginalMatrix);
+            Vector3 rotatedUp = Vector3.TransformNormal(originalUp, OriginalMatrix);
+            Vector3 rotatedDown = Vector3.TransformNormal(originalDown, OriginalMatrix);
+            Vector3 rotatedRight = Vector3.TransformNormal(originalRight, OriginalMatrix);
+            Vector3 rotatedLeft = Vector3.TransformNormal(originalLeft, OriginalMatrix);
+            
+            // 四舍五入到整数，处理浮点数误差
+            rotatedFront = new Vector3((float)Math.Round(rotatedFront.X), (float)Math.Round(rotatedFront.Y), (float)Math.Round(rotatedFront.Z));
+            rotatedBack = new Vector3((float)Math.Round(rotatedBack.X), (float)Math.Round(rotatedBack.Y), (float)Math.Round(rotatedBack.Z));
+            rotatedUp = new Vector3((float)Math.Round(rotatedUp.X), (float)Math.Round(rotatedUp.Y), (float)Math.Round(rotatedUp.Z));
+            rotatedDown = new Vector3((float)Math.Round(rotatedDown.X), (float)Math.Round(rotatedDown.Y), (float)Math.Round(rotatedDown.Z));
+            rotatedRight = new Vector3((float)Math.Round(rotatedRight.X), (float)Math.Round(rotatedRight.Y), (float)Math.Round(rotatedRight.Z));
+            rotatedLeft = new Vector3((float)Math.Round(rotatedLeft.X), (float)Math.Round(rotatedLeft.Y), (float)Math.Round(rotatedLeft.Z));
+            
+            // 根据旋转后的方向，确定每个原始面的颜色应该放在结果数组的哪个位置
+            // 结果数组顺序：前(0)、后(1)、上(2)、下(3)、右(4)、左(5)
+            
+            // 原始前面(0)的颜色现在朝向 rotatedFront 方向
+            if (rotatedFront.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝前
+            else if (rotatedFront.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝后
+            else if (rotatedFront.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝上
+            else if (rotatedFront.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝下
+            else if (rotatedFront.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝右
+            else if (rotatedFront.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝左
+            
+            // 原始后面(1)的颜色现在朝向 rotatedBack 方向
+            if (rotatedBack.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
+            else if (rotatedBack.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
+            else if (rotatedBack.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
+            else if (rotatedBack.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
+            else if (rotatedBack.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
+            else if (rotatedBack.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
+            
+            // 原始上面(2)的颜色现在朝向 rotatedUp 方向
+            if (rotatedUp.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
+            else if (rotatedUp.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
+            else if (rotatedUp.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
+            else if (rotatedUp.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
+            else if (rotatedUp.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
+            else if (rotatedUp.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
+            
+            // 原始下面(3)的颜色现在朝向 rotatedDown 方向
+            if (rotatedDown.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
+            else if (rotatedDown.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
+            else if (rotatedDown.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
+            else if (rotatedDown.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
+            else if (rotatedDown.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
+            else if (rotatedDown.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
+            
+            // 原始右面(4)的颜色现在朝向 rotatedRight 方向
+            if (rotatedRight.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
+            else if (rotatedRight.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
+            else if (rotatedRight.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
+            else if (rotatedRight.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
+            else if (rotatedRight.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
+            else if (rotatedRight.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
+            
+            // 原始左面(5)的颜色现在朝向 rotatedLeft 方向
+            if (rotatedLeft.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
+            else if (rotatedLeft.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
+            else if (rotatedLeft.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
+            else if (rotatedLeft.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
+            else if (rotatedLeft.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
+            else if (rotatedLeft.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
+            
+
+            return new string(result);
+        }
+
         private void BuildPiece()
         {
             float size = 0.96f; // 方块大小
@@ -113,7 +201,7 @@ namespace cube_obj
 
         private scene.BaseScene _baseScene;
         private GraphicsDevice _graphicsDevice;
-        private List<CubePiece> _cubes; // 存储27个方块
+        private List<CubePiece> _cubePiecies; // 存储27个方块
 
         private float _speed = MathHelper.PiOver2; // 旋转速度 弧度/秒
         private bool _isRotating = false; // 是否正在旋转
@@ -227,10 +315,151 @@ namespace cube_obj
             cube.World = finalMatrix;
         }
 
+        public string CubeState()
+        {
+            // 获取当前魔方的状态，返回一个54字符的字符串
+            ///U R F D L B
+            // 按照以下顺序获取面：上(y=1)、右(x=1)、前(z=1)、下(y=-1)、左(x=-1)、后(z=-1)、
+            // 每个面的颜色按从魔方外部面朝魔方面顺时针方向排列
+
+            string result = "";
+
+            // 上面 (U): y=1，状态字符串位置0-8
+            for (int z = -1; z <= 1; z++)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    var cube = FindCubeAtPosition(x, 1, z);
+                    if (cube != null)
+                    {
+                        string cubeState = cube.CubeState();
+                        // cubeState 顺序：前、后、上、下、左、右
+                        // 上面是索引2
+                        result += cubeState[2];
+                    }
+                    else
+                    {
+                        result += 'U';
+                    }
+                }
+            }
+
+            // 右面 (R): x=1，状态字符串位置9-17
+            for (int y = 1; y >= -1; y--)
+            {
+                for (int z = 1; z >= -1; z--)
+                {
+                    var cube = FindCubeAtPosition(1, y, z);
+                    if (cube != null)
+                    {
+                        string cubeState = cube.CubeState();
+                        // 右面是索引4
+                        result += cubeState[4];
+                    }
+                    else
+                    {
+                        result += 'R';
+                    }
+                }
+            }
+
+            // 前面 (F): z=1，状态字符串位置18-26
+            for (int y = 1; y >= -1; y--)
+            {
+                for (int x = 1; x >= -1; x--)
+                {
+                    var cube = FindCubeAtPosition(x, y, 1);
+                    if (cube != null)
+                    {
+                        string cubeState = cube.CubeState();
+                        // 前面是索引0
+                        result += cubeState[0];
+                    }
+                    else
+                    {
+                        result += 'F';
+                    }
+                }
+            }
+
+            // 下面 (D): y=-1，状态字符串位置27-35
+            for (int z = 1; z >= -1; z--)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    var cube = FindCubeAtPosition(x, -1, z);
+                    if (cube != null)
+                    {
+                        string cubeState = cube.CubeState();
+                        // 下面是索引3
+                        result += cubeState[3];
+                    }
+                    else
+                    {
+                        result += 'D';
+                    }
+                }
+            }
+
+            // 左面 (L): x=-1，状态字符串位置36-44
+            for (int y = -1; y <= 1; y++)
+            {
+                for (int z = -1; z <= 1; z++)
+                {
+                    var cube = FindCubeAtPosition(-1, y, z);
+                    if (cube != null)
+                    {
+                        string cubeState = cube.CubeState();
+                        // 左面是索引5
+                        result += cubeState[5];
+                    }
+                    else
+                    {
+                        result += 'L';
+                    }
+                }
+            }
+
+            // 后面 (B): z=-1，状态字符串位置45-53
+            for (int y = 1; y >= -1; y--)
+            {
+                for (int x = 1; x >= -1; x--)
+                {
+                    var cube = FindCubeAtPosition(x, y, -1);
+                    if (cube != null)
+                    {
+                        string cubeState = cube.CubeState();
+                        // 后面是索引1
+                        result += cubeState[1];
+                    }
+                    else
+                    {
+                        result += 'B';
+                    }
+                }
+            }
+
+
+            return result;
+        }
+
+        private CubePiece FindCubeAtPosition(float x, float y, float z)
+        {
+            foreach (var cube in _cubePiecies)
+            {
+                Vector3 pos = cube.OriginalMatrix.Translation;
+                if (Math.Abs(pos.X - x) < 0.001f && Math.Abs(pos.Y - y) < 0.001f && Math.Abs(pos.Z - z) < 0.001f)
+                {
+                    return cube;
+                }
+            }
+            return null;
+        }
+
         public void createCubeByStage()
         {
 
-            _cubes = new List<CubePiece>();
+            _cubePiecies = new List<CubePiece>();
 
             // 生成27个方块，位置从 -1 到 1，步长为1，形成3x3x3大立方体
             for (int x = -1; x <= 1; x++)
@@ -325,7 +554,7 @@ namespace cube_obj
                             faceColors[1] = tool.ColorHelper.GetDefaultColor();
                         }
 
-                        _cubes.Add(new CubePiece(_graphicsDevice, pos, faceColors));
+                        _cubePiecies.Add(new CubePiece(_graphicsDevice, pos, faceColors));
                     }
                 }
             }
@@ -358,7 +587,7 @@ namespace cube_obj
                 Matrix rotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, currentRotation);
 
                 // 更新每个小立方体的世界矩阵
-                foreach (var cube in _cubes)
+                foreach (var cube in _cubePiecies)
                 {
                     cube.World = ShouldRotateCube(cube, _currentCmd) ? cube.OriginalMatrix * rotation : cube.OriginalMatrix;
                 }
@@ -380,7 +609,7 @@ namespace cube_obj
             // 遍历所有方块进行绘制
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
-                foreach (var cube in _cubes)
+                foreach (var cube in _cubePiecies)
                 {
                     effect.World = cube.World;
                     pass.Apply();
@@ -397,11 +626,11 @@ namespace cube_obj
         private void CompleteRotation()
         {
             Matrix finalRotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, Math.Abs(tool.RotationHelper.GetRotationAngle(_currentCmd)));
-            for (int i = 0; i < _cubes.Count; i++)
+            for (int i = 0; i < _cubePiecies.Count; i++)
             {
-                if (ShouldRotateCube(_cubes[i], _currentCmd))
+                if (ShouldRotateCube(_cubePiecies[i], _currentCmd))
                 {
-                    UpdateCubeMatrix(_cubes[i], finalRotation);
+                    UpdateCubeMatrix(_cubePiecies[i], finalRotation);
                 }
             }
 

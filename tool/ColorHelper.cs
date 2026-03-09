@@ -26,5 +26,16 @@ namespace tool
         {
             return Color.Black;
         }
+
+        public static char GetCharFromColor(Color color)
+        {
+            if (color == Color.White) return 'U';
+            if (color == Color.Yellow) return 'D';
+            if (color == Color.Red) return 'F';
+            if (color == Color.Orange) return 'B';
+            if (color == Color.Green) return 'L';
+            if (color == Color.Blue) return 'R';
+            return 'U';
+        }
     }
 }

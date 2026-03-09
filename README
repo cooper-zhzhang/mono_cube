@@ -14,6 +14,8 @@
         +-------+
 
 
+解魔方算法拷贝自仓库。
+https://github.com/Megalomatt/Kociemba
              |************|
              |*U1**U2**U3*|
              |************|
@@ -34,3 +36,32 @@
              |*D7**D8**D9*|
              |************|
 
+代码在本仓库的Kociemba目录下。
+
+给出的顺序
+U R F D L B
+UUUUUUUUU
+RRRRRRRRR
+FFFFFFFFF
+DDDDDDDDD
+LLLLLLLLL
+BBBBBBBBB
+原始状态序列
+UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB
+
+
+
+打乱的序列
+UUUUUULLL
+URRURRURR
+FFFFFFFFF
+RRRDDDDDD
+LLDLLDLLD
+BBBBBBBBB
+
+
+UUUUULLL URRURRURR FFFFFFFFF RRRDDDDDD LLDLLDLLD BBBBBBBBB
+
+
+
+LLLUUUUUU RRURRURRU FFFFFFFFF BBBBBBBBB DLLDLLDLL DDDDDDRRR

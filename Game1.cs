@@ -7,14 +7,17 @@ namespace cube_game
 {
     public class Game1 : Game
     {
-        scene.SloveCubeScene _freeCubeScene;
+        scene.BaseScene _freeCubeScene;
         private GraphicsDeviceManager _graphics;
         private BasicEffect _effect;
         private Matrix _view;
         private Matrix _projection;
+
+        private string _sceneName = "FreeCubeScene";
    
-        public Game1()
+        public Game1(string sceneName)
         {
+            _sceneName  = sceneName == "" ? _sceneName : sceneName;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -45,7 +48,15 @@ namespace cube_game
                 0.1f,
                 100f);
 
-            _freeCubeScene = new scene.SloveCubeScene(_graphics, _view, _projection);
+
+            if (_sceneName == "SloveCubeScene")
+            {
+                _freeCubeScene = new scene.SloveCubeScene(_graphics, _view, _projection);
+            }
+            else
+            {
+                _freeCubeScene = new scene.FreeCubeScene(_graphics, _view, _projection);
+            }   
             _freeCubeScene .Initialize();
             _freeCubeScene .LoadContent();
         }
