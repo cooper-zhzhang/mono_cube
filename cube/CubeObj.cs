@@ -43,7 +43,7 @@ namespace cube_obj
             BuildPiece();
         }
 
-        public string CubeState()
+        public string CubePieceState()
         {
             // 面的原始顺序：前(0)、后(1)、上(2)、下(3)、右(4)、左(5)
             // 根据 OriginalMatrix 的旋转，确定每个原始面现在朝向哪个方向
@@ -79,55 +79,54 @@ namespace cube_obj
             // 根据旋转后的方向，确定每个原始面的颜色应该放在结果数组的哪个位置
             // 结果数组顺序：前(0)、后(1)、上(2)、下(3)、右(4)、左(5)
             
-            // 原始前面(0)的颜色现在朝向 rotatedFront 方向
-            if (rotatedFront.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝前
-            else if (rotatedFront.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝后
-            else if (rotatedFront.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝上
-            else if (rotatedFront.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝下
-            else if (rotatedFront.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝右
-            else if (rotatedFront.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[0]); // 朝左
+            // 原始前面的颜色现在朝向 rotatedFront 方向
+            if (rotatedFront.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝前
+            else if (rotatedFront.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝后
+            else if (rotatedFront.Y == 1) result[tool.RotationHelper.INDEX_UP] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝上
+            else if (rotatedFront.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝下
+            else if (rotatedFront.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝右
+            else if (rotatedFront.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝左
             
-            // 原始后面(1)的颜色现在朝向 rotatedBack 方向
-            if (rotatedBack.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
-            else if (rotatedBack.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
-            else if (rotatedBack.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
-            else if (rotatedBack.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
-            else if (rotatedBack.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
-            else if (rotatedBack.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[1]);
+            // 原始后面的颜色现在朝向 rotatedBack 方向
+            if (rotatedBack.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
+            else if (rotatedBack.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
+            else if (rotatedBack.Y == 1) result[tool.RotationHelper.INDEX_UP] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
+            else if (rotatedBack.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
+            else if (rotatedBack.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
+            else if (rotatedBack.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
             
-            // 原始上面(2)的颜色现在朝向 rotatedUp 方向
-            if (rotatedUp.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
-            else if (rotatedUp.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
-            else if (rotatedUp.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
-            else if (rotatedUp.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
-            else if (rotatedUp.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
-            else if (rotatedUp.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[2]);
+            // 原始上面的颜色现在朝向 rotatedUp 方向
+            if (rotatedUp.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
+            else if (rotatedUp.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
+            else if (rotatedUp.Y == 1) result[tool.RotationHelper.INDEX_UP] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
+            else if (rotatedUp.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
+            else if (rotatedUp.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
+            else if (rotatedUp.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
             
-            // 原始下面(3)的颜色现在朝向 rotatedDown 方向
-            if (rotatedDown.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
-            else if (rotatedDown.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
-            else if (rotatedDown.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
-            else if (rotatedDown.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
-            else if (rotatedDown.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
-            else if (rotatedDown.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[3]);
+            // 原始下面的颜色现在朝向 rotatedDown 方向
+            if (rotatedDown.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
+            else if (rotatedDown.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
+            else if (rotatedDown.Y == 1) result[tool.RotationHelper.INDEX_UP] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
+            else if (rotatedDown.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
+            else if (rotatedDown.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
+            else if (rotatedDown.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
             
-            // 原始右面(4)的颜色现在朝向 rotatedRight 方向
-            if (rotatedRight.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
-            else if (rotatedRight.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
-            else if (rotatedRight.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
-            else if (rotatedRight.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
-            else if (rotatedRight.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
-            else if (rotatedRight.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[4]);
+            // 原始右面的颜色现在朝向 rotatedRight 方向
+            if (rotatedRight.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
+            else if (rotatedRight.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
+            else if (rotatedRight.Y == 1) result[tool.RotationHelper.INDEX_UP] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
+            else if (rotatedRight.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
+            else if (rotatedRight.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
+            else if (rotatedRight.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
             
-            // 原始左面(5)的颜色现在朝向 rotatedLeft 方向
-            if (rotatedLeft.Z > 0.5f) result[0] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
-            else if (rotatedLeft.Z < -0.5f) result[1] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
-            else if (rotatedLeft.Y > 0.5f) result[2] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
-            else if (rotatedLeft.Y < -0.5f) result[3] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
-            else if (rotatedLeft.X > 0.5f) result[4] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
-            else if (rotatedLeft.X < -0.5f) result[5] = tool.ColorHelper.GetCharFromColor(_faceColors[5]);
-            
-
+            // 原始左面的颜色现在朝向 rotatedLeft 方向
+            if (rotatedLeft.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
+            else if (rotatedLeft.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
+            else if (rotatedLeft.Y == 1) result[tool.RotationHelper.INDEX_UP] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
+            else if (rotatedLeft.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
+            else if (rotatedLeft.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
+            else if (rotatedLeft.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
+        
             return new string(result);
         }
 
@@ -332,13 +331,14 @@ namespace cube_obj
                     var cube = FindCubeAtPosition(x, 1, z);
                     if (cube != null)
                     {
-                        string cubeState = cube.CubeState();
+                        string cubeState = cube.CubePieceState();
                         // cubeState 顺序：前、后、上、下、左、右
                         // 上面是索引2
                         result += cubeState[2];
                     }
                     else
                     {
+                        Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, 1, z);
                         result += 'U';
                     }
                 }
@@ -352,13 +352,14 @@ namespace cube_obj
                     var cube = FindCubeAtPosition(1, y, z);
                     if (cube != null)
                     {
-                        string cubeState = cube.CubeState();
+                        string cubeState = cube.CubePieceState();
                         // 右面是索引4
                         result += cubeState[4];
                     }
                     else
                     {
                         result += 'R';
+                        Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", 1, y, z);
                     }
                 }
             }
@@ -366,17 +367,18 @@ namespace cube_obj
             // 前面 (F): z=1，状态字符串位置18-26
             for (int y = 1; y >= -1; y--)
             {
-                for (int x = 1; x >= -1; x--)
+                for (int x = -1; x <= 1; x++)
                 {
                     var cube = FindCubeAtPosition(x, y, 1);
                     if (cube != null)
                     {
-                        string cubeState = cube.CubeState();
+                        string cubeState = cube.CubePieceState();
                         // 前面是索引0
                         result += cubeState[0];
                     }
                     else
                     {
+                        Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, y, 1);
                         result += 'F';
                     }
                 }
@@ -390,32 +392,34 @@ namespace cube_obj
                     var cube = FindCubeAtPosition(x, -1, z);
                     if (cube != null)
                     {
-                        string cubeState = cube.CubeState();
+                        string cubeState = cube.CubePieceState();
                         // 下面是索引3
                         result += cubeState[3];
                     }
                     else
                     {
                         result += 'D';
+                        Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, -1, z);
                     }
                 }
             }
 
             // 左面 (L): x=-1，状态字符串位置36-44
-            for (int y = -1; y <= 1; y++)
+            for (int y = 1; y >= -1; y--)
             {
                 for (int z = -1; z <= 1; z++)
                 {
                     var cube = FindCubeAtPosition(-1, y, z);
                     if (cube != null)
                     {
-                        string cubeState = cube.CubeState();
+                        string cubeState = cube.CubePieceState();
                         // 左面是索引5
                         result += cubeState[5];
                     }
                     else
                     {
                         result += 'L';
+                        Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", -1, y, z);
                     }
                 }
             }
@@ -428,13 +432,14 @@ namespace cube_obj
                     var cube = FindCubeAtPosition(x, y, -1);
                     if (cube != null)
                     {
-                        string cubeState = cube.CubeState();
+                        string cubeState = cube.CubePieceState();
                         // 后面是索引1
                         result += cubeState[1];
                     }
                     else
                     {
                         result += 'B';
+                        Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, y, -1);
                     }
                 }
             }
@@ -456,11 +461,52 @@ namespace cube_obj
             return null;
         }
 
+        private int GetFaceIndex(int x, int y, int z, char face)
+        {
+            int baseIndex = 0;
+            int row = 0;
+            int col = 0;
+
+            switch (face)
+            {
+                case tool.RotationHelper.FACE_FRONT: // 前面 (F): z=1，状态字符串位置18-26
+                    baseIndex = 18;
+                    row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                    col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
+                    break;
+                case tool.RotationHelper.FACE_BACK: // 后面 (B): z=-1，状态字符串位置45-53
+                    baseIndex = 45;
+                    row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                    col = 1 - x; // x=-1→col=2, x=0→col=1, x=1→col=0 (镜像)
+                    break;
+                case tool.RotationHelper.FACE_UP: // 上面 (U): y=1，状态字符串位置0-8
+                    baseIndex = 0;
+                    row = 1 + z; // z=-1→row=2, z=0→row=1, z=1→row=0
+                    col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
+                    break;
+                case tool.RotationHelper.FACE_DOWN: // 下面 (D): y=-1，状态字符串位置27-35
+                    baseIndex = 27;
+                    row = 1 - z; // z=-1→row=2, z=0→row=1, z=1→row=0
+                    col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
+                    break;
+                case tool.RotationHelper.FACE_RIGHT: // 右面 (R): x=1，状态字符串位置9-17
+                    baseIndex = 9;
+                    row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                    col = 1 - z; // z=-1→col=0, z=0→col=1, z=1→col=2
+                    break;
+                case tool.RotationHelper.FACE_LEFT: // 左面 (L): x=-1，状态字符串位置36-44
+                    baseIndex = 36;
+                    row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
+                    col = 1 + z; // z=-1→col=0, z=0→col=1, z=1→col=2
+                    break;
+            }
+
+            return baseIndex + row * 3 + col;
+        }
+
         public void createCubeByStage()
         {
-
             _cubePiecies = new List<CubePiece>();
-
             // 生成27个方块，位置从 -1 到 1，步长为1，形成3x3x3大立方体
             for (int x = -1; x <= 1; x++)
             {
@@ -473,85 +519,72 @@ namespace cube_obj
                         // 为每个方块生成6个面的颜色，使用魔方状态字符串
                         Color[] faceColors = new Color[6];
 
-                        // 面索引：0=前(Z正), 1=后(Z负), 2=上(Y正), 3=下(Y负), 4=右(X正), 5=左(X负)
+                        // 面索引：FACE_FRONT=前(Z正), FACE_BACK=后(Z负), FACE_UP=上(Y正), FACE_DOWN=下(Y负), FACE_RIGHT=右(X正), FACE_LEFT=左(X负)
+                        
                         // 上面 (U): y=1，状态字符串位置0-8
                         if (y == 1)
                         {
-                            int row = 1 + z; // z=-1→row=2, z=0→row=1, z=1→row=0
-                            int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
-                            int index = row * 3 + col;
-                            faceColors[2] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
+                            int index = GetFaceIndex(x, y, z, tool.RotationHelper.FACE_UP);
+                            faceColors[tool.RotationHelper.INDEX_UP] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
-                            faceColors[2] = Color.Black;
+                            faceColors[tool.RotationHelper.INDEX_UP] = Color.Black;
                         }
 
                         // 右面 (R): x=1，状态字符串位置9-17
                         if (x == 1)
                         {
-                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
-                            int col = 1 - z; // z=-1→col=0, z=0→col=1, z=1→col=2
-                            int index = 9 + row * 3 + col;
-                            faceColors[4] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
+                            int index = GetFaceIndex(x, y, z, tool.RotationHelper.FACE_RIGHT);
+                            faceColors[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
-                            faceColors[4] = tool.ColorHelper.GetDefaultColor();
+                            faceColors[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetDefaultColor();
                         }
 
-                        // 前面 (F): 原为z==-1，现对应几何体前面（Z正），所以颜色应来自状态字符串前面部分
-                        // 但逻辑前面（视觉上我们希望看到的面）对应原始状态字符串的前面（索引18-26）
-                        // 而几何体前面是Z正，所以当z==1时才是几何体前面，应赋前面颜色
-                        if (z == 1) // 几何体前面
+                        // 前面 (F): z=1，状态字符串位置18-26
+                        if (z == 1)
                         {
-                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
-                            int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
-                            int index = 18 + row * 3 + col; // 前面状态字符串
-                            faceColors[0] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
+                            int index = GetFaceIndex(x, y, z, tool.RotationHelper.FACE_FRONT);
+                            faceColors[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
-                            faceColors[0] = tool.ColorHelper.GetDefaultColor();
+                            faceColors[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetDefaultColor();
                         }
 
                         // 下面 (D): y=-1，状态字符串位置27-35
                         if (y == -1)
                         {
-                            int row = 1 - z; // z=-1→row=0, z=0→row=1, z=1→row=2
-                            int col = x + 1; // x=-1→col=0, x=0→col=1, x=1→col=2
-                            int index = 27 + row * 3 + col;
-                            faceColors[3] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
+                            int index = GetFaceIndex(x, y, z, tool.RotationHelper.FACE_DOWN);
+                            faceColors[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
-                            faceColors[3] = tool.ColorHelper.GetDefaultColor();
+                            faceColors[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetDefaultColor();
                         }
 
                         // 左面 (L): x=-1，状态字符串位置36-44
                         if (x == -1)
                         {
-                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
-                            int col = 1 + z; // z=-1→col=2, z=0→col=1, z=1→col=0 (镜像)
-                            int index = 36 + row * 3 + col;
-                            faceColors[5] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
+                            int index = GetFaceIndex(x, y, z, tool.RotationHelper.FACE_LEFT);
+                            faceColors[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
-                            faceColors[5] = tool.ColorHelper.GetDefaultColor();
+                            faceColors[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetDefaultColor();
                         }
 
-                        // 后面 (B): 原为z==1，现对应几何体后面（Z负），所以颜色应来自状态字符串后面部分
-                        if (z == -1) // 几何体后面
+                        // 后面 (B): z=-1，状态字符串位置45-53
+                        if (z == -1)
                         {
-                            int row = 1 - y; // y=-1→row=2, y=0→row=1, y=1→row=0
-                            int col = 1 - x; // x=-1→col=2, x=0→col=1, x=1→col=0 (镜像)
-                            int index = 45 + row * 3 + col; // 后面状态字符串
-                            faceColors[1] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
+                            int index = GetFaceIndex(x, y, z, tool.RotationHelper.FACE_BACK);
+                            faceColors[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetColorFromChar(_cubeState[index]);
                         }
                         else
                         {
-                            faceColors[1] = tool.ColorHelper.GetDefaultColor();
+                            faceColors[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetDefaultColor();
                         }
 
                         _cubePiecies.Add(new CubePiece(_graphicsDevice, pos, faceColors));

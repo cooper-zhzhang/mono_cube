@@ -18,11 +18,6 @@ namespace scene
         {
             _cube = new cube_obj.Cube(_graphics.GraphicsDevice, "UUUUUULLLURRURRURRFFFFFFFFFRRRDDDDDDLLDLLDLLDBBBBBBBBB", this);
             _cube.createCubeByStage();
-
-            string slove = _cube.SloveCube();
-            slove= "F'"; // TODO: test
-            Console.WriteLine("slove {0}", slove);
-
             buildCMD();
         }
 
@@ -84,53 +79,8 @@ namespace scene
         {
              _sloveCMD = new List<string>();
             string slove = _cube.SloveCube();
-
-            int i = 0;
-            while (true)
-            {
-                int nextI;
-                string cmd = NextCMD(slove, i, out nextI);
-                if (cmd == "")
-                {
-                    break;
-                }
-                _sloveCMD.Add(cmd);
-                i = nextI;
-            }
+            // 使用空格将slove 字符串分割为多个命令
+            _sloveCMD.AddRange(slove.Split(' '));
         }
-
-        private string NextCMD(string sloveState, int index, out int newIndex)
-        {
-            string currentCmd = "";
-            int i = index;
-            for (; i < sloveState.Length - 1;)
-            {
-                char c = sloveState[i];
-
-                char nextC = i + 1 < sloveState.Length ? sloveState[i + 1] : ' ';
-                char nextNC = i + 2 < sloveState.Length ? sloveState[i + 2] : ' ';
-                currentCmd = "" + c;
-                i++;
-
-                if (nextC == '\'' || nextNC == '2')
-                {
-                    currentCmd = currentCmd + nextC;
-                    i++;
-                }
-
-                if (nextNC == '2' && nextC == '\'')
-                {
-                    currentCmd = currentCmd + nextNC;
-                    i++;
-                }
-                break;
-            }
-            newIndex = i;
-
-            return currentCmd;
-        }
-
     }
-
-
 }

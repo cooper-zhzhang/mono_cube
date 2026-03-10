@@ -15,6 +15,14 @@ namespace tool
         public const char FACE_FRONT = 'F';
         public const char FACE_BACK = 'B';
 
+        // 面索引常量（用于数组索引）
+        public const int INDEX_FRONT = 0;  // 前(Z正)
+        public const int INDEX_BACK = 1;   // 后(Z负)
+        public const int INDEX_UP = 2;     // 上(Y正)
+        public const int INDEX_DOWN = 3;   // 下(Y负)
+        public const int INDEX_RIGHT = 4;  // 右(X正)
+        public const int INDEX_LEFT = 5;   // 左(X负)
+
         // 旋转指令字符串常量
         public const string CMD_UP = "U";
         public const string CMD_UP_PRIME = "U'";
