@@ -2,22 +2,27 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using scene;
 
 namespace cube_game
 {
     public class Game1 : Game
     {
+        // 场景名称常量
+        public const string SCENE_FREE_CUBE = "FreeCubeScene";
+        public const string SCENE_SOLVE_CUBE = "SloveCubeScene";
+
         scene.BaseScene _freeCubeScene;
         private GraphicsDeviceManager _graphics;
         private BasicEffect _effect;
         private Matrix _view;
         private Matrix _projection;
 
-        private string _sceneName = "FreeCubeScene";
-   
+        private string _sceneName = SCENE_FREE_CUBE;
+
         public Game1(string sceneName)
         {
-            _sceneName  = sceneName == "" ? _sceneName : sceneName;
+            _sceneName = sceneName == "" ? _sceneName : sceneName;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -48,17 +53,22 @@ namespace cube_game
                 0.1f,
                 100f);
 
+            // 初始化（只需调用一次）
+            SceneManager.Instance.Initialize(_graphics, _view, _projection);
 
-            if (_sceneName == "SloveCubeScene")
+            // // 切换到指定场景
+            // SceneManager.Instance.ChangeScene(SceneManager.SCENE_FREE_CUBE);
+
+            if (_sceneName == SCENE_SOLVE_CUBE)
             {
                 _freeCubeScene = new scene.SloveCubeScene(_graphics, _view, _projection);
             }
             else
             {
                 _freeCubeScene = new scene.FreeCubeScene(_graphics, _view, _projection);
-            }   
-            _freeCubeScene .Initialize();
-            _freeCubeScene .LoadContent();
+            }
+            _freeCubeScene.Initialize();
+            _freeCubeScene.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
