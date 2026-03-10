@@ -6,6 +6,9 @@ obj/
 Content/obj/
 Content/*.mgstats
 
+# Assets文件夹（包含Kociemba算法的数据表）
+Assets/
+
 # IDE配置（如果需要共享IDE配置，可以注释掉）
 # .vscode/
 

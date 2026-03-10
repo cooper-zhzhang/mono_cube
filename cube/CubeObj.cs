@@ -601,14 +601,11 @@ namespace cube_obj
 
             if (!_isRotating && _currentCmd != "")
             {
-                // Console.WriteLine("!_isRotating && _currentCmd != ");
-                // 开始旋转
                 _isRotating = true;
                 __rotatingTimer = 0;
             }
             else if (_isRotating)
             {
-
                 float angle = tool.RotationHelper.GetRotationAngle(_currentCmd);// 
                 // 正在旋转：根据_speed（弧度/秒）计算旋转角度
                 float currentRotation = __rotatingTimer * _speed;
