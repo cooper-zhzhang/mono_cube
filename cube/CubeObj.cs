@@ -517,10 +517,8 @@ namespace cube_obj
                         Vector3 pos = new Vector3(x, y, z);
 
                         // 为每个方块生成6个面的颜色，使用魔方状态字符串
-                        Color[] faceColors = new Color[6];
-
+                        Color[] faceColors = new Color[tool.RotationHelper.INDEX_MAX];
                         // 面索引：FACE_FRONT=前(Z正), FACE_BACK=后(Z负), FACE_UP=上(Y正), FACE_DOWN=下(Y负), FACE_RIGHT=右(X正), FACE_LEFT=左(X负)
-                        
                         // 上面 (U): y=1，状态字符串位置0-8
                         if (y == 1)
                         {

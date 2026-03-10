@@ -22,6 +22,9 @@ namespace tool
         public const int INDEX_DOWN = 3;   // 下(Y负)
         public const int INDEX_RIGHT = 4;  // 右(X正)
         public const int INDEX_LEFT = 5;   // 左(X负)
+        public const int INDEX_MAX = 6;   // 最大索引值（用于循环遍历）
+
+
 
         // 旋转指令字符串常量
         public const string CMD_UP = "U";
