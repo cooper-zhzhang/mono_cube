@@ -80,8 +80,9 @@ namespace Kociemba
 
         public static void SerializeTable(string filename, short[,] array)
         {
-            EnsureFolder("Assets\\Kociemba\\Tables\\");
-            using (BinaryWriter writer = new BinaryWriter(File.Open("Assets\\Kociemba\\Tables\\" + filename, FileMode.Create)))
+            string tablesPath = Path.Combine("Assets", "Kociemba", "Tables");
+            EnsureFolder(tablesPath);
+            using (BinaryWriter writer = new BinaryWriter(File.Open(Path.Combine(tablesPath, filename), FileMode.Create)))
             {
                 int rows = array.GetLength(0);
                 int cols = array.GetLength(1);
@@ -99,8 +100,9 @@ namespace Kociemba
 
         public static short[,] DeserializeTable(string filename)
         {
-            EnsureFolder("Assets\\Kociemba\\Tables\\");
-            using (BinaryReader reader = new BinaryReader(File.Open("Assets\\Kociemba\\Tables\\" + filename, FileMode.Open)))
+            string tablesPath = Path.Combine("Assets", "Kociemba", "Tables");
+            EnsureFolder(tablesPath);
+            using (BinaryReader reader = new BinaryReader(File.Open(Path.Combine(tablesPath, filename), FileMode.Open)))
             {
                 int rows = reader.ReadInt32();
                 int cols = reader.ReadInt32();
@@ -119,8 +121,9 @@ namespace Kociemba
         public static void SerializeSbyteArray(string filename, sbyte[] array)
         {
             Console.WriteLine("SerializeSbyteArray");
-            EnsureFolder("Assets\\Kociemba\\Tables\\");
-            using (BinaryWriter writer = new BinaryWriter(File.Open("Assets\\Kociemba\\Tables\\" + filename, FileMode.Create)))
+            string tablesPath = Path.Combine("Assets", "Kociemba", "Tables");
+            EnsureFolder(tablesPath);
+            using (BinaryWriter writer = new BinaryWriter(File.Open(Path.Combine(tablesPath, filename), FileMode.Create)))
             {
                 writer.Write(array.Length);
                 for (int i = 0; i < array.Length; i++)
@@ -132,8 +135,9 @@ namespace Kociemba
 
         public static sbyte[] DeserializeSbyteArray(string filename)
         {
-            EnsureFolder("Assets\\Kociemba\\Tables\\");
-            using (BinaryReader reader = new BinaryReader(File.Open("Assets\\Kociemba\\Tables\\" + filename, FileMode.Open)))
+            string tablesPath = Path.Combine("Assets", "Kociemba", "Tables");
+            EnsureFolder(tablesPath);
+            using (BinaryReader reader = new BinaryReader(File.Open(Path.Combine(tablesPath, filename), FileMode.Open)))
             {
                 int length = reader.ReadInt32();
                 sbyte[] array = new sbyte[length];
