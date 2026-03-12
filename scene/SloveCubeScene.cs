@@ -18,7 +18,7 @@ namespace scene
         {
             _cube = new cube_obj.Cube(_graphics.GraphicsDevice, "UUUUUULLLURRURRURRFFFFFFFFFRRRDDDDDDLLDLLDLLDBBBBBBBBB", this);
             _cube.createCubeByStage();
-            buildCMD();
+            //buildCMD();
         }
 
         public override void Initialize()

@@ -78,6 +78,7 @@ namespace cube_game
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             _freeCubeScene.Update(gameTime);
+            //SceneManager.Instance.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -85,6 +86,7 @@ namespace cube_game
         protected override void Draw(GameTime gameTime)
         {
             _freeCubeScene.Draw(gameTime);
+            //SceneManager.Instance.Draw(gameTime);
 
             base.Draw(gameTime);
         }

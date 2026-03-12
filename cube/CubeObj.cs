@@ -23,12 +23,6 @@ namespace cube_obj
         // 当前的位置（包含旋转后的位置，但平移部分保持整数）
         public Matrix OriginalMatrix { get; set; }
 
-        // 更新原始位置
-        public void UpdateOriginalPosition(Vector3 newPosition)
-        {
-            OriginalPosition = newPosition;
-        }
-
         // 每个面的颜色（数组顺序：前、后、上、下、左、右）
         private Color[] _faceColors;
 
@@ -48,9 +42,9 @@ namespace cube_obj
             // 面的原始顺序：前(0)、后(1)、上(2)、下(3)、右(4)、左(5)
             // 根据 OriginalMatrix 的旋转，确定每个原始面现在朝向哪个方向
             // 返回顺序：前、后、上、下、左、右
-            
+
             char[] result = new char[6];
-            
+
             // 从 OriginalMatrix 提取旋转信息
             // 在右手坐标系中，Z轴正方向指向屏幕外（前面）
             Vector3 originalFront = new Vector3(0, 0, 1);   // 原始前面方向
@@ -59,7 +53,7 @@ namespace cube_obj
             Vector3 originalDown = new Vector3(0, -1, 0);   // 原始下面方向
             Vector3 originalRight = new Vector3(1, 0, 0);   // 原始右面方向
             Vector3 originalLeft = new Vector3(-1, 0, 0);   // 原始左面方向
-            
+
             // 应用旋转矩阵，获取旋转后的方向
             Vector3 rotatedFront = Vector3.TransformNormal(originalFront, OriginalMatrix);
             Vector3 rotatedBack = Vector3.TransformNormal(originalBack, OriginalMatrix);
@@ -67,7 +61,7 @@ namespace cube_obj
             Vector3 rotatedDown = Vector3.TransformNormal(originalDown, OriginalMatrix);
             Vector3 rotatedRight = Vector3.TransformNormal(originalRight, OriginalMatrix);
             Vector3 rotatedLeft = Vector3.TransformNormal(originalLeft, OriginalMatrix);
-            
+
             // 四舍五入到整数，处理浮点数误差
             rotatedFront = new Vector3((float)Math.Round(rotatedFront.X), (float)Math.Round(rotatedFront.Y), (float)Math.Round(rotatedFront.Z));
             rotatedBack = new Vector3((float)Math.Round(rotatedBack.X), (float)Math.Round(rotatedBack.Y), (float)Math.Round(rotatedBack.Z));
@@ -75,10 +69,10 @@ namespace cube_obj
             rotatedDown = new Vector3((float)Math.Round(rotatedDown.X), (float)Math.Round(rotatedDown.Y), (float)Math.Round(rotatedDown.Z));
             rotatedRight = new Vector3((float)Math.Round(rotatedRight.X), (float)Math.Round(rotatedRight.Y), (float)Math.Round(rotatedRight.Z));
             rotatedLeft = new Vector3((float)Math.Round(rotatedLeft.X), (float)Math.Round(rotatedLeft.Y), (float)Math.Round(rotatedLeft.Z));
-            
+
             // 根据旋转后的方向，确定每个原始面的颜色应该放在结果数组的哪个位置
             // 结果数组顺序：前(0)、后(1)、上(2)、下(3)、右(4)、左(5)
-            
+
             // 原始前面的颜色现在朝向 rotatedFront 方向
             if (rotatedFront.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝前
             else if (rotatedFront.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝后
@@ -86,7 +80,7 @@ namespace cube_obj
             else if (rotatedFront.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝下
             else if (rotatedFront.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝右
             else if (rotatedFront.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_FRONT]); // 朝左
-            
+
             // 原始后面的颜色现在朝向 rotatedBack 方向
             if (rotatedBack.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
             else if (rotatedBack.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
@@ -94,7 +88,7 @@ namespace cube_obj
             else if (rotatedBack.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
             else if (rotatedBack.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
             else if (rotatedBack.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_BACK]);
-            
+
             // 原始上面的颜色现在朝向 rotatedUp 方向
             if (rotatedUp.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
             else if (rotatedUp.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
@@ -102,7 +96,7 @@ namespace cube_obj
             else if (rotatedUp.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
             else if (rotatedUp.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
             else if (rotatedUp.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_UP]);
-            
+
             // 原始下面的颜色现在朝向 rotatedDown 方向
             if (rotatedDown.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
             else if (rotatedDown.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
@@ -110,7 +104,7 @@ namespace cube_obj
             else if (rotatedDown.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
             else if (rotatedDown.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
             else if (rotatedDown.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_DOWN]);
-            
+
             // 原始右面的颜色现在朝向 rotatedRight 方向
             if (rotatedRight.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
             else if (rotatedRight.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
@@ -118,7 +112,7 @@ namespace cube_obj
             else if (rotatedRight.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
             else if (rotatedRight.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
             else if (rotatedRight.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_RIGHT]);
-            
+
             // 原始左面的颜色现在朝向 rotatedLeft 方向
             if (rotatedLeft.Z == 1) result[tool.RotationHelper.INDEX_FRONT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
             else if (rotatedLeft.Z == -1) result[tool.RotationHelper.INDEX_BACK] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
@@ -126,7 +120,7 @@ namespace cube_obj
             else if (rotatedLeft.Y == -1) result[tool.RotationHelper.INDEX_DOWN] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
             else if (rotatedLeft.X == 1) result[tool.RotationHelper.INDEX_RIGHT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
             else if (rotatedLeft.X == -1) result[tool.RotationHelper.INDEX_LEFT] = tool.ColorHelper.GetCharFromColor(_faceColors[tool.RotationHelper.INDEX_LEFT]);
-        
+
             return new string(result);
         }
 
@@ -205,7 +199,7 @@ namespace cube_obj
         private float _speed = MathHelper.PiOver2; // 旋转速度 弧度/秒
         private bool _isRotating = false; // 是否正在旋转
         private string _currentCmd = ""; // 当前要旋转的命令
-        private float __rotatingTimer = 0; // 旋转时间
+        private float _rotatingTimer = 0; // 旋转时间
 
         private string _cubeState = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // 魔方状态字符串
         private string _sloveState;
@@ -286,7 +280,6 @@ namespace cube_obj
                     return false;
             }
         }
-
 
         // 完成一次旋转后整体更新每个小立方体的矩阵
         private void UpdateCubeMatrix(cube_obj.CubePiece cube, Matrix rotation)
@@ -591,6 +584,114 @@ namespace cube_obj
             }
         }
 
+
+
+        protected void CompleteRotationStage()
+        {
+            switch (_currentCmd)
+            {
+                case tool.RotationHelper.CMD_UP:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 1);
+                    break;
+                case tool.RotationHelper.CMD_UP_2:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 2);
+                    break;
+                case tool.RotationHelper.CMD_UP_PRIME:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 3);
+                    break;
+                case tool.RotationHelper.CMD_FRONT:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 1);
+                    break;
+                case tool.RotationHelper.CMD_FRONT_2:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 2);
+                    break;
+                case tool.RotationHelper.CMD_FRONT_PRIME:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 3);
+                    break;
+                case tool.RotationHelper.CMD_BACK:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 1);
+                    break;
+                case tool.RotationHelper.CMD_BACK_2:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 2);
+                    break;
+                case tool.RotationHelper.CMD_BACK_PRIME:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 3);
+                    break;
+                case tool.RotationHelper.CMD_DOWN:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 1);
+                    break;
+                case tool.RotationHelper.CMD_DOWN_2:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 2);
+                    break;
+                case tool.RotationHelper.CMD_DOWN_PRIME:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 3);
+                    break;
+                case tool.RotationHelper.CMD_RIGHT:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 1);
+                    break;
+                case tool.RotationHelper.CMD_RIGHT_2:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 2);
+                    break;
+                case tool.RotationHelper.CMD_RIGHT_PRIME:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 3);
+                    break;
+                case tool.RotationHelper.CMD_LEFT:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 1);
+                    break;
+                case tool.RotationHelper.CMD_LEFT_2:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 2);
+                    break;
+                case tool.RotationHelper.CMD_LEFT_PRIME:
+                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 3);
+                    break;
+                default:
+                    return;
+            }
+
+            // 完成旋转后重绘
+            createCubeByStage();
+            _isRotating = false;
+            _rotatingTimer = 0;
+            _currentCmd = ""; // 重置为等待输入状态
+        }
+
+        // 直接运转stage, 不操作方块
+        protected void RotationStageByCmd(string cmd)
+        {
+            if (_currentCmd == "")
+            {
+                _currentCmd = cmd;
+            }
+
+            if (!_isRotating && _currentCmd != "")
+            {
+                _isRotating = true;
+                _rotatingTimer = 0;
+            }
+            else if (_isRotating)
+            {
+                float angle = tool.RotationHelper.GetRotationAngle(_currentCmd);
+                // 正在旋转：根据_speed（弧度/秒）计算旋转角度
+                float currentRotation = _rotatingTimer * _speed;
+                float rotationProgress = Math.Min(1.0f, Math.Abs(currentRotation / angle));
+
+                // 创建旋转矩阵
+                Matrix rotation = tool.RotationHelper.CreateRotationMatrix(_currentCmd, currentRotation);
+
+                // 更新每个小立方体的世界矩阵
+                foreach (var cube in _cubePiecies)
+                {
+                    cube.World = ShouldRotateCube(cube, _currentCmd) ? cube.OriginalMatrix * rotation : cube.OriginalMatrix;
+                }
+
+                // 旋转完成
+                if (rotationProgress >= 1.0f)
+                {
+                    CompleteRotationStage();
+                }
+            }
+        }
+
         // 按照指令进行旋转
         protected void RotationByCmd(string cmd)
         {
@@ -602,13 +703,13 @@ namespace cube_obj
             if (!_isRotating && _currentCmd != "")
             {
                 _isRotating = true;
-                __rotatingTimer = 0;
+                _rotatingTimer = 0;
             }
             else if (_isRotating)
             {
-                float angle = tool.RotationHelper.GetRotationAngle(_currentCmd);// 
+                float angle = tool.RotationHelper.GetRotationAngle(_currentCmd);
                 // 正在旋转：根据_speed（弧度/秒）计算旋转角度
-                float currentRotation = __rotatingTimer * _speed;
+                float currentRotation = _rotatingTimer * _speed;
                 float rotationProgress = Math.Min(1.0f, Math.Abs(currentRotation / angle));
 
                 // 创建旋转矩阵
@@ -647,8 +748,10 @@ namespace cube_obj
         }
         public void Update(GameTime gameTime)
         {
-            __rotatingTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            RotationByCmd("");
+            _rotatingTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            // RotationByCmd("");
+            RotationStageByCmd("");
         }
 
         private void CompleteRotation()
@@ -663,7 +766,7 @@ namespace cube_obj
             }
 
             _isRotating = false;
-            __rotatingTimer = 0;
+            _rotatingTimer = 0;
             _currentCmd = ""; // 重置为等待输入状态
         }
     }
