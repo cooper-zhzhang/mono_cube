@@ -40,6 +40,15 @@ namespace cube_game.tests
                 bool isCorrect = ret == InitialState;
                 Console.WriteLine($"Face {face}: {(isCorrect ? "正确 ✓" : "错误 ✗")}");
             }
+
+            // 测试旋转一次后状态与原状态不相等
+            Console.WriteLine("\n=== 测试旋转一次后状态与原状态不相等 ===");
+            foreach (string face in Faces)
+            {
+                string ret = tool.RotationHelper.RotationStage(InitialState, face[0], 1);
+                bool isDifferent = ret != InitialState;
+                Console.WriteLine($"Face {face} 旋转一次后: {(isDifferent ? "不同 ✓" : "相同 ✗")}");
+            }
             Console.WriteLine();
         }
 
