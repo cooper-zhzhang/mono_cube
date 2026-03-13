@@ -229,6 +229,37 @@ namespace cube_game.tests
             }
             Console.WriteLine($"旋转60次后状态: {ret}");
             
+            // 反向打乱一次
+            Console.WriteLine("\n=== 测试反向旋转 (R L B F D U x10) ===");
+            for (int i = 59; i >= 0; i--)
+            {
+                if (i % 6 == 0)
+                {
+                    ret = tool.RotationHelper.RotationStage(ret, 'R', 3);
+                }
+                else if (i % 6 == 1)
+                {
+                    ret = tool.RotationHelper.RotationStage(ret, 'L', 3);
+                }
+                else if (i % 6 == 2)
+                {
+                    ret = tool.RotationHelper.RotationStage(ret, 'B', 3);
+                }
+                else if (i % 6 == 3)
+                {
+                    ret = tool.RotationHelper.RotationStage(ret, 'F', 3);
+                }
+                else if (i % 6 == 4)
+                {
+                    ret = tool.RotationHelper.RotationStage(ret, 'D', 3);
+                }
+                else if (i % 6 == 5)
+                {
+                    ret = tool.RotationHelper.RotationStage(ret, 'U', 3);
+                }
+            }
+            Console.WriteLine($"反向旋转60次后状态: {ret}");
+            
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             string solution = Kociemba.Search.solution(ret, out string info, useSeparator: false);
             stopwatch.Stop();

@@ -1,10 +1,17 @@
+using System;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace tool
 {
-    public class RotationHelper
+
+    public class RotationTable
+    {
+        public int[] face;
+        public int[] edge;
+    };
+    public static class RotationHelper
     {
         // 面标识符常量
         public const char FACE_UP = 'U';
@@ -128,87 +135,129 @@ namespace tool
             }
         }
 
-
-        // 六个面的顺时针映射 (新索引 : 旧索引)
-        public static Dictionary<char, Dictionary<int, int>> clockwiseMaps = new Dictionary<char, Dictionary<int, int>>
+        public static readonly IReadOnlyDictionary<string, RotationTable> RotationTableMap =
+        new Dictionary<string, RotationTable>
         {
-            [FACE_UP] = new Dictionary<int, int>
-            {
-                // U face (0-8)
-                {0, 6}, {1, 3}, {2, 0},
-                {3, 7}, {4, 4}, {5, 1},
-                {6, 8}, {7, 5}, {8, 2},
-                // edges: F.top → R.top → B.top → L.top → F.top
-                {19, 10}, {20, 11}, {10, 46}, {11, 47}, {46, 37}, {47, 38}, {37, 19}, {38, 20}
-            },
+            {"F", new RotationTable{
+                face = new int[] {18, 19, 20, 23, 26, 25, 24, 21},
+                edge = new int[] {6, 7, 8, 9, 12, 15, 29, 28, 27, 44, 41, 38}
+            }},
 
-            [FACE_RIGHT] = new Dictionary<int, int>
-            {
-                // R face (9-17)
-                {9, 15}, {10, 12}, {11, 9},
-                {12, 16}, {13, 13}, {14, 10},
-                {15, 17}, {16, 14}, {17, 11},
-                // edges: U.right → F.right → D.right → B.right → U.right
-                {5, 23}, {23, 32}, {32, 48}, {48, 5}
-            },
+          {"R", new RotationTable{
+            face = new int[] {9, 10, 11,  14, 17, 16, 15, 12},
+            edge = new int[] {8, 5, 2, 45, 48, 51, 35, 32, 29, 26 ,23, 20},// error
 
-            [FACE_FRONT] = new Dictionary<int, int>
-            {
-                // F face (18-26)
-                {18, 24}, {19, 21}, {20, 18},
-                {21, 25}, {22, 22}, {23, 19},
-                {24, 26}, {25, 23}, {26, 20},
-                // edges: U.front → R.front → D.front → L.front → U.front
-                {7, 14}, {14, 28}, {28, 40}, {40, 7}
-            },
+			//9 10 11 14 17 16 15 12
+			// 8 5 1 45 48 51 35 32 29 26 23 20
+          }},
 
-            [FACE_DOWN] = new Dictionary<int, int>
-            {
-                // D face (27-35)
-                {27, 33}, {28, 30}, {29, 27},
-                {30, 34}, {31, 31}, {32, 28},
-                {33, 35}, {34, 32}, {35, 29},
-                // edges: F.bottom → R.bottom → B.bottom → L.bottom → F.bottom
-                {25, 43}, {26, 44}, {43, 52}, {44, 53}, {52, 16}, {53, 17}, {16, 25}, {17, 26}
-            },
-
-            [FACE_LEFT] = new Dictionary<int, int>
-            {
-                // L face (36-44)
-                {36, 42}, {37, 39}, {38, 36},
-                {39, 43}, {40, 40}, {41, 37},
-                {42, 44}, {43, 41}, {44, 38},
-                // edges: U.left → F.left → D.left → B.left → U.left
-                {3, 21}, {21, 30}, {30, 50}, {50, 3}
-            },
-
-            [FACE_BACK] = new Dictionary<int, int>
-            {
-                // B face (45-53)
-                {45, 51}, {46, 48}, {47, 45},
-                {48, 52}, {49, 49}, {50, 46},
-                {51, 53}, {52, 50}, {53, 47},
-                // edges: U.back → R.back → D.back → L.back → U.back
-                {1, 16}, {16, 34}, {34, 42}, {42, 1}
+          {"U", new RotationTable{
+              face = new int[] {0, 1, 2, 5, 8, 7, 6, 3},
+              edge = new int[] {47, 46, 45, 11, 10, 9, 20, 19, 18, 38, 37, 36}
             }
+          },
+
+
+          {"D", new RotationTable{
+              face = new int[] {27,28,29,32,35,34,33,30},
+              edge = new int[] {24,25,26,15,16,17,51,52,53,42,43,44}
+            }
+          },
+
+          {"L", new RotationTable{
+              face = new int[] {36, 37, 38, 41, 44, 43, 42, 39 },
+              edge = new int[] {0 ,3 ,6 ,18, 21 ,24 ,27, 30 ,33 ,53 ,50 ,47} // error
+            }
+          },
+
+          {"B", new RotationTable{
+              face = new int[] {45,46,47,50,53,52,51,48},
+              edge = new int[] {2,1,0,36,39,42,33,34,35,17,14,11}
+            }
+          },
         };
 
+        /*
+          "qian": {
+            "face": {18, 19, 20, 23, 26, 25, 24, 21},
+            "edge":{6, 7, 8, 9, 12, 15, 29, 28, 27, 44, 41, 38}
+          },		
+
+          "you":{
+            "face":{9, 10, 11,  14, 17, 16, 15, 12},
+            "edge":{8, 7, 6, 45, 48, 51, 35, 32, 29, 26, 23, 20},
+          }
+
+                "shang":{
+              "face":{0, 1, 2, 5, 8, 7, 6, 3},
+              "edge":{47, 46, 45, 11, 10, 9, 20, 19, 18, 38, 37, 36}
+            }				
 
 
-        public static string RotationStage(string cubeState, char face, int times = 1)
-        {
-            Dictionary<int, int> rotationMap = clockwiseMaps[face];
-            for (int i = 0; i < times; i++)
-            {
-                char[] new_state = cubeState.ToCharArray();
-                foreach (var pair in rotationMap)
-                {
-                    new_state[pair.Key] = cubeState[pair.Value];
-                }
-                cubeState = new string(new_state);
+            "xia":{
+              "face":{27,28,29,32,35,34,33,30},
+              "edge":{24,25,26,15,16,17,51,52,53,42,43,44}
             }
 
-            return cubeState;
+            "zuo":{
+              "face":{9,10,11,14,17,16,15,12},
+              "edge":{8,7,6,45,48,51,35,32,29,26,23,20}
+            }
+
+
+          "hou":{
+            "face":{45,46,47,50,53,52,51,48},
+            "edge":{2,1,0,36,39,42,33,34,35,17,14,11}
+          }
+
+        */
+
+        public static string RotationStage(string cube, char cmove, int times)
+        {
+            var rotationTable = RotationTableMap[cmove.ToString()];
+            if (rotationTable == null)
+            {
+                return cube;
+            }
+
+            for (int j = 0; j < times; j++)
+            {
+                char[] oldCubeArray = (char[])cube.ToCharArray();
+                char[] cubeArray = (char[])cube.ToCharArray().Clone();
+                // 深拷贝 cube
+                string copyCube = cube;
+                for (int i = 0; i < rotationTable.face.Length; i++)
+                {
+                    cubeArray[rotationTable.face[(i + 2) % rotationTable.face.Length]] = oldCubeArray[rotationTable.face[i]];
+                }
+
+                for (int i = 0; i < rotationTable.edge.Length; i++)
+                {
+                    cubeArray[rotationTable.edge[(i + 3) % rotationTable.edge.Length]] = oldCubeArray[rotationTable.edge[i]];
+                }
+
+                cube = new string(cubeArray);
+
+            }
+
+            return cube;
         }
+
+        /*
+                public static string RotationStage(string cubeState, char face, int times = 1)
+                {
+                    Dictionary<int, int> rotationMap = clockwiseMaps[face];
+                    for (int i = 0; i < times; i++)
+                    {
+                        char[] new_state = cubeState.ToCharArray();
+                        foreach (var pair in rotationMap)
+                        {
+                            new_state[pair.Key] = cubeState[pair.Value];
+                        }
+                        cubeState = new string(new_state);
+                    }
+
+                    return cubeState;
+                }*/
     }
 }
