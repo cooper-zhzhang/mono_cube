@@ -212,6 +212,79 @@ namespace tool
 
         */
 
+        public static string RotationStage(string cubeState, string[] cmd)
+        {
+            foreach (var item in cmd)
+            {
+                cubeState = tool.RotationHelper.RotationStage(cubeState, item);
+            }
+            return cubeState;
+        }
+
+        public static string RotationStage(string cubeState, string cmd)
+        {
+            switch (cmd)
+            {
+                case CMD_UP:
+                    cubeState = RotationStage(cubeState, FACE_UP, 1);
+                    break;
+                case CMD_UP_2:
+                    cubeState = RotationStage(cubeState, FACE_UP, 2);
+                    break;
+                case CMD_UP_PRIME:
+                    cubeState = RotationStage(cubeState, FACE_UP, 3);
+                    break;
+                case CMD_FRONT:
+                    cubeState = RotationStage(cubeState, FACE_FRONT, 1);
+                    break;
+                case CMD_FRONT_2:
+                    cubeState = RotationStage(cubeState, FACE_FRONT, 2);
+                    break;
+                case CMD_FRONT_PRIME:
+                    cubeState = RotationStage(cubeState, FACE_FRONT, 3);
+                    break;
+                case CMD_BACK:
+                    cubeState = RotationStage(cubeState, FACE_BACK, 1);
+                    break;
+                case CMD_BACK_2:
+                    cubeState = RotationStage(cubeState, FACE_BACK, 2);
+                    break;
+                case CMD_BACK_PRIME:
+                    cubeState = RotationStage(cubeState, FACE_BACK, 3);
+                    break;
+                case CMD_DOWN:
+                    cubeState = RotationStage(cubeState, FACE_DOWN, 1);
+                    break;
+                case CMD_DOWN_2:
+                    cubeState = RotationStage(cubeState, FACE_DOWN, 2);
+                    break;
+                case CMD_DOWN_PRIME:
+                    cubeState = RotationStage(cubeState, FACE_DOWN, 3);
+                    break;
+                case CMD_RIGHT:
+                    cubeState = RotationStage(cubeState, FACE_RIGHT, 1);
+                    break;
+                case CMD_RIGHT_2:
+                    cubeState = RotationStage(cubeState, FACE_RIGHT, 2);
+                    break;
+                case CMD_RIGHT_PRIME:
+                    cubeState = RotationStage(cubeState, FACE_RIGHT, 3);
+                    break;
+                case CMD_LEFT:
+                    cubeState = RotationStage(cubeState, FACE_LEFT, 1);
+                    break;
+                case CMD_LEFT_2:
+                    cubeState = RotationStage(cubeState, FACE_LEFT, 2);
+                    break;
+                case CMD_LEFT_PRIME:
+                    cubeState = RotationStage(cubeState, FACE_LEFT, 3);
+                    break;
+                default:
+                    return cubeState;
+            }
+
+            return cubeState;
+        }
         public static string RotationStage(string cube, char cmove, int times)
         {
             var rotationTable = RotationTableMap[cmove.ToString()];
@@ -242,22 +315,5 @@ namespace tool
 
             return cube;
         }
-
-        /*
-                public static string RotationStage(string cubeState, char face, int times = 1)
-                {
-                    Dictionary<int, int> rotationMap = clockwiseMaps[face];
-                    for (int i = 0; i < times; i++)
-                    {
-                        char[] new_state = cubeState.ToCharArray();
-                        foreach (var pair in rotationMap)
-                        {
-                            new_state[pair.Key] = cubeState[pair.Value];
-                        }
-                        cubeState = new string(new_state);
-                    }
-
-                    return cubeState;
-                }*/
     }
 }
