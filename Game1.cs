@@ -12,6 +12,8 @@ namespace cube_game
         public const string SCENE_FREE_CUBE = "FreeCubeScene";
         public const string SCENE_SOLVE_CUBE = "SloveCubeScene";
 
+        public const string SCENE_BUILD_CUBE = "BuildCubeScene";
+
         scene.BaseScene _freeCubeScene;
         private GraphicsDeviceManager _graphics;
         private BasicEffect _effect;
@@ -63,9 +65,12 @@ namespace cube_game
             {
                 _freeCubeScene = new scene.SloveCubeScene(_graphics, _view, _projection);
             }
-            else
+            else if (_sceneName == SCENE_FREE_CUBE)
             {
                 _freeCubeScene = new scene.FreeCubeScene(_graphics, _view, _projection);
+            }else
+            {
+                 _freeCubeScene = new scene.BuildScene(_graphics, _view, _projection);
             }
             _freeCubeScene.Initialize();
             _freeCubeScene.LoadContent();

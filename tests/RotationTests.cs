@@ -230,6 +230,7 @@ namespace cube_game.tests
             Console.WriteLine($"旋转60次后状态: {ret}");
 
             
+            ret = "URFFUURRLULLFRBBBDDUFDFRUFULLRRDURBLRUFLLFDBBDDFLBDBDB";
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             string solution = Kociemba.Search.solution(ret, out string info, useSeparator: false);
             stopwatch.Stop();
