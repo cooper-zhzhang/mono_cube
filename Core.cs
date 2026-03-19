@@ -123,7 +123,7 @@ public class Core : Game
         SpriteBatch = new SpriteBatch(GraphicsDevice);
 
         // 切换到初始场景
-        ChangeScene(new cube_game_scene.TitleScene());
+        ChangeScene(new cube_game_scene.SloveCubeScene());
     }
 
     protected override void UnloadContent()

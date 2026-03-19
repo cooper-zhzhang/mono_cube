@@ -50,6 +50,85 @@ namespace tool
         public const string CMD_FRONT_2 = "F2";
         public const string CMD_BACK_2 = "B2";
 
+        public static bool IsValidCmd(string cmd)
+        {
+            if (CMD_UP == cmd)
+            {
+                return true;
+            }
+            else if (CMD_UP_PRIME == cmd)
+            {
+                return true;
+            }
+            else if (CMD_DOWN == cmd)
+            {
+                return true;
+            }
+            else if (CMD_DOWN_PRIME == cmd)
+            {
+                return true;
+            }
+            else if (CMD_LEFT == cmd)
+            {
+                return true;
+            }
+            else if (CMD_LEFT_PRIME == cmd)
+            {
+                return true;
+            }
+            else if (CMD_RIGHT == cmd)
+            {
+                return true;
+            }
+            else if (CMD_RIGHT_PRIME == cmd)
+            {
+                return true;
+            }
+            else if (CMD_FRONT == cmd)
+            {
+                return true;
+            }
+            else if (CMD_FRONT_PRIME == cmd)
+            {
+                return true;
+            }
+            else if (CMD_BACK == cmd)
+            {
+                return true;
+            }
+            else if (CMD_BACK_PRIME == cmd)
+            {
+                return true;
+            }
+            else if (CMD_UP_2 == cmd)
+            {
+                return true;
+            }
+            else if (CMD_DOWN_2 == cmd)
+            {
+                return true;
+            }
+            else if (CMD_LEFT_2 == cmd)
+            {
+                return true;
+            }
+            else if (CMD_RIGHT_2 == cmd)
+            {
+                return true;
+            }
+            else if (CMD_FRONT_2 == cmd)
+            {
+                return true;
+            }
+            else if (CMD_BACK_2 == cmd)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         // 正值表示顺时针，负值表示逆时针
         public static float GetRotationAngle(string cmd)
         {

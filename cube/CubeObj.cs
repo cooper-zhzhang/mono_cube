@@ -218,7 +218,6 @@ namespace cube_obj
         private float _rotatingTimer = 0; // 旋转时间
 
         private string _cubeState = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // 魔方状态字符串
-        private string _sloveState;
 
 
         public bool CanInputCmd()
@@ -256,11 +255,7 @@ namespace cube_obj
             Console.WriteLine("SloveCube {0}", _cubeState);
             string facelets = _cubeState;
             string info;
-            string solution = SearchRunTime.solution(facelets, out info, maxDepth: 22, timeOut: 6000, useSeparator: false);
-
-            // TODO: 做成异步 设置解决中状态
-            _sloveState = solution;
-
+            string solution = Kociemba.Search.solution(facelets, out info, useSeparator: false);
             return solution;
         }
 
@@ -325,138 +320,7 @@ namespace cube_obj
 
         public string CubeState()
         {
-
             return _cubeState;
-            // 获取当前魔方的状态，返回一个54字符的字符串
-            ///U R F D L B
-            // 按照以下顺序获取面：上(y=1)、右(x=1)、前(z=1)、下(y=-1)、左(x=-1)、后(z=-1)、
-            // 每个面的颜色按从魔方外部面朝魔方面顺时针方向排列
-
-            // string result = "";
-
-            // // 上面 (U): y=1，状态字符串位置0-8
-            // for (int z = -1; z <= 1; z++)
-            // {
-            //     for (int x = -1; x <= 1; x++)
-            //     {
-            //         var cube = FindCubeAtPosition(x, 1, z);
-            //         if (cube != null)
-            //         {
-            //             string cubeState = cube.CubePieceState();
-            //             // cubeState 顺序：前、后、上、下、左、右
-            //             // 上面是索引2
-            //             result += cubeState[2];
-            //         }
-            //         else
-            //         {
-            //             Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, 1, z);
-            //             result += 'U';
-            //         }
-            //     }
-            // }
-
-            // // 右面 (R): x=1，状态字符串位置9-17
-            // for (int y = 1; y >= -1; y--)
-            // {
-            //     for (int z = 1; z >= -1; z--)
-            //     {
-            //         var cube = FindCubeAtPosition(1, y, z);
-            //         if (cube != null)
-            //         {
-            //             string cubeState = cube.CubePieceState();
-            //             // 右面是索引4
-            //             result += cubeState[4];
-            //         }
-            //         else
-            //         {
-            //             result += 'R';
-            //             Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", 1, y, z);
-            //         }
-            //     }
-            // }
-
-            // // 前面 (F): z=1，状态字符串位置18-26
-            // for (int y = 1; y >= -1; y--)
-            // {
-            //     for (int x = -1; x <= 1; x++)
-            //     {
-            //         var cube = FindCubeAtPosition(x, y, 1);
-            //         if (cube != null)
-            //         {
-            //             string cubeState = cube.CubePieceState();
-            //             // 前面是索引0
-            //             result += cubeState[0];
-            //         }
-            //         else
-            //         {
-            //             Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, y, 1);
-            //             result += 'F';
-            //         }
-            //     }
-            // }
-
-            // // 下面 (D): y=-1，状态字符串位置27-35
-            // for (int z = 1; z >= -1; z--)
-            // {
-            //     for (int x = -1; x <= 1; x++)
-            //     {
-            //         var cube = FindCubeAtPosition(x, -1, z);
-            //         if (cube != null)
-            //         {
-            //             string cubeState = cube.CubePieceState();
-            //             // 下面是索引3
-            //             result += cubeState[3];
-            //         }
-            //         else
-            //         {
-            //             result += 'D';
-            //             Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, -1, z);
-            //         }
-            //     }
-            // }
-
-            // // 左面 (L): x=-1，状态字符串位置36-44
-            // for (int y = 1; y >= -1; y--)
-            // {
-            //     for (int z = -1; z <= 1; z++)
-            //     {
-            //         var cube = FindCubeAtPosition(-1, y, z);
-            //         if (cube != null)
-            //         {
-            //             string cubeState = cube.CubePieceState();
-            //             // 左面是索引5
-            //             result += cubeState[5];
-            //         }
-            //         else
-            //         {
-            //             result += 'L';
-            //             Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", -1, y, z);
-            //         }
-            //     }
-            // }
-
-            // // 后面 (B): z=-1，状态字符串位置45-53
-            // for (int y = 1; y >= -1; y--)
-            // {
-            //     for (int x = 1; x >= -1; x--)
-            //     {
-            //         var cube = FindCubeAtPosition(x, y, -1);
-            //         if (cube != null)
-            //         {
-            //             string cubeState = cube.CubePieceState();
-            //             // 后面是索引1
-            //             result += cubeState[1];
-            //         }
-            //         else
-            //         {
-            //             result += 'B';
-            //             Console.WriteLine($"未找到位置 ({0}, {1}, {2}) 的立方体", x, y, -1);
-            //         }
-            //     }
-            // }
-
-
-            // return result;
         }
 
         private CubePiece FindCubeAtPosition(float x, float y, float z)
@@ -515,8 +379,13 @@ namespace cube_obj
             return baseIndex + row * 3 + col;
         }
 
-        public void createCubeByStage()
+        public bool createCubeByStage()
         {
+            // 检查魔方状态字符串是否有效
+            if (_cubeState.Length != 54)
+            {
+                return false;
+            }
             _cubePiecies = new List<CubePiece>();
             // 生成27个方块，位置从 -1 到 1，步长为1，形成3x3x3大立方体
             for (int x = -1; x <= 1; x++)
@@ -600,6 +469,8 @@ namespace cube_obj
                     }
                 }
             }
+        
+            return true;
         }
 
 
@@ -667,7 +538,7 @@ namespace cube_obj
             }
 
 
-            Console.WriteLine( "after rotation: " + _cubeState);
+            // Console.WriteLine( "after rotation: " + _cubeState);
 
             // 完成旋转后重绘
             createCubeByStage();
