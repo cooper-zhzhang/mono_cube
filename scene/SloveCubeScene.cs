@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 
-namespace scene
+namespace cube_game_scene
 {
     public class SloveCubeScene : BaseScene
     {

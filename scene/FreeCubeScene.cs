@@ -2,7 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace scene
+namespace cube_game_scene
 {
     public class FreeCubeScene : BaseScene
     {

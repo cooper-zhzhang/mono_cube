@@ -21,11 +21,14 @@ public class Core : Game
     public static Matrix Projection;
 
 
+    private static  cube_game_input.InputManager Input;
+
+
     // The scene that is currently active.
-    private static scene.BaseScene s_activeScene;
+    private static cube_game_scene.BaseScene s_activeScene;
 
     // The next scene to switch to, if there is one.
-    private static scene.BaseScene s_nextScene;
+    private static cube_game_scene.BaseScene s_nextScene;
 
     /// <summary>
     /// Gets the graphics device manager to control the presentation of graphics.
@@ -100,6 +103,7 @@ public class Core : Game
         base.Initialize();
 
         // graphics device.
+        Input = new cube_game_input.InputManager();
         GraphicsDevice = base.GraphicsDevice;
 
         // 设置图形设备状态
@@ -119,7 +123,7 @@ public class Core : Game
         SpriteBatch = new SpriteBatch(GraphicsDevice);
 
         // 切换到初始场景
-        ChangeScene(new scene.TitleScene());
+        ChangeScene(new cube_game_scene.TitleScene());
     }
 
     protected override void UnloadContent()
@@ -136,12 +140,12 @@ public class Core : Game
     protected override void Update(GameTime gameTime)
     {
         // Update the input manager.
-        // Input.Update(gameTime);
+        Input.Update(gameTime);
 
-        // if (ExitOnEscape && Input.Keyboard.WasKeyJustPressed(Keys.Escape))
-        // {
-        //     Exit();
-        // }
+        if (ExitOnEscape && Input.Keyboard.WasKeyJustPressed(Keys.Escape))
+        {
+            Exit();
+        }
 
         if (s_nextScene != null)
         {
@@ -168,7 +172,7 @@ public class Core : Game
         base.Draw(gameTime);
     }
 
-    public static void ChangeScene(scene.BaseScene next)
+    public static void ChangeScene(cube_game_scene.BaseScene next)
     {
         // Only set the next scene value if it is not the same
         // instance as the currently active scene.

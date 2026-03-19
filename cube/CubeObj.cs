@@ -208,7 +208,7 @@ namespace cube_obj
     public class Cube : IDisposable
     {
 
-        private scene.BaseScene _baseScene;
+        private cube_game_scene.BaseScene _baseScene;
         private GraphicsDevice _graphicsDevice;
         private List<CubePiece> _cubePiecies; // 存储27个方块
 
@@ -242,7 +242,7 @@ namespace cube_obj
             return true;
         }
 
-        public Cube(GraphicsDevice graphicsDevice, string cubeState, scene.BaseScene baseScene)
+        public Cube(GraphicsDevice graphicsDevice, string cubeState, cube_game_scene.BaseScene baseScene)
         {
             _baseScene = baseScene;
             _graphicsDevice = graphicsDevice;

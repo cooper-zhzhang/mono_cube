@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using tool;
 
-namespace scene
+namespace cube_game_scene
 {
     public class TitleScene : BaseScene
     {
