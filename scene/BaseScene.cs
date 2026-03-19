@@ -1,41 +1,123 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 
 namespace scene
 {
-    public class BaseScene
+    public abstract class BaseScene : IDisposable
     {
-        public GraphicsDeviceManager _graphics { get; protected set; } = null;
-        public BasicEffect _effect { get; protected set; } = null;
-        public Matrix _view { get; protected set; } = Matrix.Identity;
-        public Matrix _projection { get; protected set; } = Matrix.Identity;
+        public GraphicsDeviceManager Graphics { get; protected set; }
+        public BasicEffect Effect { get; protected set; }
+        public Matrix View { get; protected set; } = Matrix.Identity;
+        public Matrix Projection { get; protected set; } = Matrix.Identity;
+        
+        /// <summary>
+        /// 获取场景的ContentManager，用于加载场景特定资源
+        /// </summary>
+        protected ContentManager Content { get; }
+        
+        /// <summary>
+        /// 获取场景是否已被释放
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+        
+        /// <summary>
+        /// 获取场景名称
+        /// </summary>
+        public abstract string Name { get; }
+        
+        /// <summary>
+        /// 创建新的场景实例
+        /// </summary>
         public BaseScene(GraphicsDeviceManager graphics, Matrix view, Matrix projection)
         {
-            _graphics = graphics;
-            _view = view;
-            _projection = projection;
+            Graphics = graphics;
+            View = view;
+            Projection = projection;
+            
+            // 场景专用的ContentManager暂时不使用
+            // 后续版本可以添加对Game实例的引用
+            Content = null;
         }
-
+        
+        // 析构函数，在对象被垃圾回收器清理时调用
+        ~BaseScene() => Dispose(false);
+        
+        /// <summary>
+        /// 初始化场景
+        /// </summary>
+        public virtual void Initialize()
+        {
+            LoadContent();
+        }
+        
+        /// <summary>
+        /// 加载场景内容
+        /// </summary>
         public virtual void LoadContent()
         {
-
-            _effect = new BasicEffect(_graphics.GraphicsDevice);
-            _effect.VertexColorEnabled = true;
-
+            Effect = new BasicEffect(Graphics.GraphicsDevice);
+            Effect.VertexColorEnabled = true;
+            Effect.LightingEnabled = false;
         }
-
-
+        
+        /// <summary>
+        /// 进入场景时调用
+        /// </summary>
+        public virtual void Entry()
+        {
+        }
+        
+        /// <summary>
+        /// 离开场景时调用
+        /// </summary>
+        public virtual void Leave()
+        {
+        }
+        
+        /// <summary>
+        /// 更新场景逻辑
+        /// </summary>
         public virtual void Update(GameTime gameTime)
         {
         }
+        
+        /// <summary>
+        /// 绘制场景
+        /// </summary>
         public virtual void Draw(GameTime gameTime)
         {
-
+            Graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
         }
-        public virtual void Initialize()
+        
+        /// <summary>
+        /// 释放场景资源
+        /// </summary>
+        public void Dispose()
         {
-
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        
+        /// <summary>
+        /// 释放场景资源
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    Effect?.Dispose();
+                    Content?.Unload();
+                }
+                
+                // 释放非托管资源
+                
+                IsDisposed = true;
+            }
         }
     }
 }

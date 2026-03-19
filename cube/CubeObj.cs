@@ -7,7 +7,7 @@ using Kociemba;
 
 namespace cube_obj
 {
-    public class CubePiece
+    public class CubePiece : IDisposable
     {
         private GraphicsDevice _graphicsDevice;
         private VertexBuffer _vertexBuffer;
@@ -187,9 +187,25 @@ namespace cube_obj
             _graphicsDevice.Indices = _indexBuffer;
             _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _primitiveCount);
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // 释放托管资源
+                _vertexBuffer?.Dispose();
+                _indexBuffer?.Dispose();
+            }
+        }
     }
 
-    public class Cube
+    public class Cube : IDisposable
     {
 
         private scene.BaseScene _baseScene;
@@ -736,9 +752,9 @@ namespace cube_obj
 
         public void Draw(GameTime gameTime)
         {
-            BasicEffect effect = _baseScene._effect;
-            effect.View = _baseScene._view;
-            effect.Projection = _baseScene._projection;
+            BasicEffect effect = _baseScene.Effect;
+            effect.View = _baseScene.View;
+            effect.Projection = _baseScene.Projection;
 
             // 遍历所有方块进行绘制
             foreach (var pass in effect.CurrentTechnique.Passes)
@@ -773,6 +789,32 @@ namespace cube_obj
             _isRotating = false;
             _rotatingTimer = 0;
             _currentCmd = ""; // 重置为等待输入状态
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // 释放托管资源
+                if (_cubePiecies != null)
+                {
+                    foreach (var cubePiece in _cubePiecies)
+                    {
+                        // 如果 CubePiece 实现了 IDisposable，则调用其 Dispose 方法
+                        if (cubePiece is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
+                    }
+                    _cubePiecies.Clear();
+                }
+            }
         }
     }
 }

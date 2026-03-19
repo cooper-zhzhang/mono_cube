@@ -37,7 +37,13 @@ namespace scene
         private SpriteBatch _spriteBatch;
         private Texture2D _pixelTexture;
 
-        public BuildScene(GraphicsDeviceManager graphics, Matrix view, Matrix projection) : base(graphics, view, projection)
+        public override string Name => "BuildScene";
+
+        public BuildScene() : base(cube_game.Core.Graphics, Matrix.CreateLookAt(new Vector3(4, 5, 8), Vector3.Zero, Vector3.Up),  Matrix.CreatePerspectiveFieldOfView(
+            MathHelper.PiOver4,
+            cube_game.Core.GraphicsDevice.Viewport.AspectRatio,
+            0.1f,
+            100f))
         {
             Debug.WriteLine("[BuildScene] 构造函数被调用");
         }
@@ -70,8 +76,8 @@ namespace scene
             base.LoadContent();
             
             // 创建精灵批处理和像素纹理
-            _spriteBatch = new SpriteBatch(_graphics.GraphicsDevice);
-            _pixelTexture = new Texture2D(_graphics.GraphicsDevice, 1, 1);
+            _spriteBatch = new SpriteBatch(Graphics.GraphicsDevice);
+            _pixelTexture = new Texture2D(Graphics.GraphicsDevice, 1, 1);
             _pixelTexture.SetData(new[] { Color.White });
             
             Debug.WriteLine("[BuildScene] LoadContent 完成");
@@ -198,7 +204,7 @@ namespace scene
             Debug.WriteLine("[BuildScene] Draw 开始");
             
             // 绘制背景
-            _graphics.GraphicsDevice.Clear(Color.Gray);
+            Graphics.GraphicsDevice.Clear(Color.Gray);
             Debug.WriteLine("[BuildScene] 背景已清除为灰色");
 
             // 检查资源是否已加载
@@ -312,8 +318,8 @@ namespace scene
         private void CalculateFaceletPositions()
         {
             Debug.WriteLine("[BuildScene] CalculateFaceletPositions 开始");
-            int screenWidth = _graphics.GraphicsDevice.Viewport.Width;
-            int screenHeight = _graphics.GraphicsDevice.Viewport.Height;
+            int screenWidth = Graphics.GraphicsDevice.Viewport.Width;
+            int screenHeight = Graphics.GraphicsDevice.Viewport.Height;
             Debug.WriteLine($"[BuildScene] 屏幕尺寸: {screenWidth}x{screenHeight}");
 
             // 计算中心位置
@@ -438,8 +444,8 @@ namespace scene
         private void CalculateColorSelectorPosition()
         {
             Debug.WriteLine("[BuildScene] CalculateColorSelectorPosition 开始");
-            int screenWidth = _graphics.GraphicsDevice.Viewport.Width;
-            int screenHeight = _graphics.GraphicsDevice.Viewport.Height;
+            int screenWidth = Graphics.GraphicsDevice.Viewport.Width;
+            int screenHeight = Graphics.GraphicsDevice.Viewport.Height;
             
             // 计算 D 面的底部位置（D面在F面下方，索引27-35）
             int faceWidth = 3 * _faceletSize + 2 * _margin;
@@ -463,8 +469,6 @@ namespace scene
         private void CalculateOutputButtonPosition()
         {
             Debug.WriteLine("[BuildScene] CalculateOutputButtonPosition 开始");
-            int screenWidth = _graphics.GraphicsDevice.Viewport.Width;
-            int screenHeight = _graphics.GraphicsDevice.Viewport.Height;
             
             // 将输出按钮放在颜色选择器的右边
             int buttonWidth = 120;
@@ -495,9 +499,17 @@ namespace scene
 
         private string GetCubeStateString()
         {
-            // 按照 URFDLB 的顺序输出魔方状态
-            // U面(0-8) R面(9-17) F面(18-26) D面(27-35) L面(36-44) B面(45-53)
             return _cubeState;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _spriteBatch?.Dispose();
+                _pixelTexture?.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

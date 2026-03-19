@@ -6,13 +6,19 @@ namespace scene
 {
     public class FreeCubeScene : BaseScene
     {
-
         private cube_obj.Cube _cube;
         
+        public override string Name => "FreeCubeScene";
+        
         // 每个对象继承 obj 类，包含位置、旋转、缩放、颜色等属性。
-        public FreeCubeScene(GraphicsDeviceManager graphics, Matrix _view, Matrix _projection) : base(graphics, _view, _projection)
+        public FreeCubeScene() 
+        : base(cube_game.Core.Graphics, Matrix.CreateLookAt(new Vector3(4, 5, 8), Vector3.Zero, Vector3.Up),  Matrix.CreatePerspectiveFieldOfView(
+            MathHelper.PiOver4,
+            cube_game.Core.GraphicsDevice.Viewport.AspectRatio,
+            0.1f,
+            100f))
         {
-            _cube = new cube_obj.Cube(_graphics.GraphicsDevice, "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB", this);
+            _cube = new cube_obj.Cube(Graphics.GraphicsDevice, "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB", this);
             _cube.createCubeByStage();
         }
 
@@ -23,9 +29,11 @@ namespace scene
 
         public override void Draw(GameTime gameTime)
         {
-            _graphics.GraphicsDevice.Clear(Color.Gray);
-            _cube.Draw(gameTime);
             base.Draw(gameTime);
+
+            cube_game.Core.GraphicsDevice.Clear(Color.Gray);
+            // Graphics.GraphicsDevice.Clear(Color.Gray);
+            _cube.Draw(gameTime);
         }
 
         public override void Update(GameTime gameTime)
@@ -59,16 +67,24 @@ namespace scene
         public override void LoadContent()
         {
             base.LoadContent();
-            _effect.VertexColorEnabled = true;
-            _effect.LightingEnabled = false;
+            // Effect.VertexColorEnabled = true;
+            // Effect.LightingEnabled = false;
 
-            _view = Matrix.CreateLookAt(new Vector3(6, 4, 6), Vector3.Zero, Vector3.Up);
-            _projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.PiOver4,
-                _graphics.GraphicsDevice.Viewport.AspectRatio,
-                0.1f,
-                100f);
+            // View = Matrix.CreateLookAt(new Vector3(6, 4, 6), Vector3.Zero, Vector3.Up);
+            // Projection = Matrix.CreatePerspectiveFieldOfView(
+            //     MathHelper.PiOver4,
+            //     Graphics.GraphicsDevice.Viewport.AspectRatio,
+            //     0.1f,
+            //     100f);
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _cube?.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }
