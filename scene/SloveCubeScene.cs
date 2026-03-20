@@ -92,13 +92,18 @@ namespace cube_game_scene
             _sloveCMD = new List<string>();
             string slove = _cube.SloveCube();
             // 使用空格将slove 字符串分割为多个命令
-            _sloveCMD.AddRange(slove.Split(' '));
+            _sloveCMD.AddRange(slove.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+            // TODO:    删除
+            Console.WriteLine("cmd {0}", slove);
             // 检测是否为有效的命令
             for (int i = 0; i < _sloveCMD.Count; i++)
             {
+                Console.WriteLine("cmd \"{0}\" is {1}", _sloveCMD[i], i);
                 if (!tool.RotationHelper.IsValidCmd(_sloveCMD[i]))
                 {
+                    Console.WriteLine("cmd {0} is not valid", _sloveCMD[i]);
                     _sloveCMD.Clear();
+                    return;
                 }
             }
         }
