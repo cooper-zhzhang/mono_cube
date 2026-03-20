@@ -323,19 +323,6 @@ namespace cube_obj
             return _cubeState;
         }
 
-        private CubePiece FindCubeAtPosition(float x, float y, float z)
-        {
-            foreach (var cube in _cubePiecies)
-            {
-                Vector3 pos = cube.OriginalMatrix.Translation;
-                if (Math.Abs(pos.X - x) < 0.001f && Math.Abs(pos.Y - y) < 0.001f && Math.Abs(pos.Z - z) < 0.001f)
-                {
-                    return cube;
-                }
-            }
-            return null;
-        }
-
         private int GetFaceIndex(int x, int y, int z, char face)
         {
             int baseIndex = 0;
@@ -469,77 +456,78 @@ namespace cube_obj
                     }
                 }
             }
-        
+
             return true;
         }
 
+        // protected string RotationStage(string cubeStage)
+        // {
+        //     switch (_currentCmd)
+        //     {
+        //         case tool.RotationHelper.CMD_UP:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 1);
+        //             break;
+        //         case tool.RotationHelper.CMD_UP_2:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 2);
+        //             break;
+        //         case tool.RotationHelper.CMD_UP_PRIME:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 3);
+        //             break;
+        //         case tool.RotationHelper.CMD_FRONT:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 1);
+        //             break;
+        //         case tool.RotationHelper.CMD_FRONT_2:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 2);
+        //             break;
+        //         case tool.RotationHelper.CMD_FRONT_PRIME:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 3);
+        //             break;
+        //         case tool.RotationHelper.CMD_BACK:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 1);
+        //             break;
+        //         case tool.RotationHelper.CMD_BACK_2:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 2);
+        //             break;
+        //         case tool.RotationHelper.CMD_BACK_PRIME:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 3);
+        //             break;
+        //         case tool.RotationHelper.CMD_DOWN:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 1);
+        //             break;
+        //         case tool.RotationHelper.CMD_DOWN_2:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 2);
+        //             break;
+        //         case tool.RotationHelper.CMD_DOWN_PRIME:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 3);
+        //             break;
+        //         case tool.RotationHelper.CMD_RIGHT:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 1);
+        //             break;
+        //         case tool.RotationHelper.CMD_RIGHT_2:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 2);
+        //             break;
+        //         case tool.RotationHelper.CMD_RIGHT_PRIME:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 3);
+        //             break;
+        //         case tool.RotationHelper.CMD_LEFT:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 1);
+        //             break;
+        //         case tool.RotationHelper.CMD_LEFT_2:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 2);
+        //             break;
+        //         case tool.RotationHelper.CMD_LEFT_PRIME:
+        //             _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 3);
+        //             break;
+        //         default:
+        //             return _cubeState;
+        //     }
+        //     return _cubeState;
+        // }
 
 
         protected void CompleteRotationStage()
         {
-            switch (_currentCmd)
-            {
-                case tool.RotationHelper.CMD_UP:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 1);
-                    break;
-                case tool.RotationHelper.CMD_UP_2:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 2);
-                    break;
-                case tool.RotationHelper.CMD_UP_PRIME:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_UP, 3);
-                    break;
-                case tool.RotationHelper.CMD_FRONT:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 1);
-                    break;
-                case tool.RotationHelper.CMD_FRONT_2:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 2);
-                    break;
-                case tool.RotationHelper.CMD_FRONT_PRIME:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_FRONT, 3);
-                    break;
-                case tool.RotationHelper.CMD_BACK:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 1);
-                    break;
-                case tool.RotationHelper.CMD_BACK_2:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 2);
-                    break;
-                case tool.RotationHelper.CMD_BACK_PRIME:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_BACK, 3);
-                    break;
-                case tool.RotationHelper.CMD_DOWN:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 1);
-                    break;
-                case tool.RotationHelper.CMD_DOWN_2:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 2);
-                    break;
-                case tool.RotationHelper.CMD_DOWN_PRIME:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_DOWN, 3);
-                    break;
-                case tool.RotationHelper.CMD_RIGHT:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 1);
-                    break;
-                case tool.RotationHelper.CMD_RIGHT_2:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 2);
-                    break;
-                case tool.RotationHelper.CMD_RIGHT_PRIME:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_RIGHT, 3);
-                    break;
-                case tool.RotationHelper.CMD_LEFT:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 1);
-                    break;
-                case tool.RotationHelper.CMD_LEFT_2:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 2);
-                    break;
-                case tool.RotationHelper.CMD_LEFT_PRIME:
-                    _cubeState = tool.RotationHelper.RotationStage(_cubeState, tool.RotationHelper.FACE_LEFT, 3);
-                    break;
-                default:
-                    return;
-            }
-
-
-            // Console.WriteLine( "after rotation: " + _cubeState);
-
+            _cubeState = tool.RotationHelper.RotationStage(_cubeState, _currentCmd);
             // 完成旋转后重绘
             createCubeByStage();
             _isRotating = false;
@@ -550,7 +538,7 @@ namespace cube_obj
         // 直接运转stage, 不操作方块
         protected void RotationStageByCmd(string cmd)
         {
-            if (_currentCmd == "")
+            if (_currentCmd == "" && tool.RotationHelper.IsValidCmd(cmd))
             {
                 _currentCmd = cmd;
             }
