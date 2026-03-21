@@ -8,16 +8,25 @@ namespace tool
 {
     public class ColorHelper
     {
+
+
+        public static Color White = Color.White;
+        public static Color Yellow = Color.Yellow;
+        public static Color Red = Color.Red;
+        public static Color Orange = new Color(255, 100, 0); // 更饱和的橙色
+        public static Color Green = Color.SeaGreen;
+        public static Color Blue = Color.DodgerBlue;
+
          public static Color GetColorFromChar(char c)
         {
             switch (c)
             {
-                case 'U': return Color.White;
-                case 'D': return Color.Yellow;
-                case 'F': return Color.Red;
-                case 'B': return Color.Orange;
-                case 'L': return Color.Green;
-                case 'R': return Color.Blue;
+                case 'U': return White;
+                case 'D': return Yellow;
+                case 'F': return Red;
+                case 'B': return Orange;
+                case 'L': return Green;
+                case 'R': return Blue;
                 default: return Color.Black;
             }
         }

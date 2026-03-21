@@ -60,6 +60,14 @@ namespace cube_game_scene
             Effect = new BasicEffect(Graphics.GraphicsDevice);
             Effect.VertexColorEnabled = true;
             Effect.LightingEnabled = false;
+            
+            // 确保图形效果一致，避免颜色深度差异
+            Effect.Alpha = 1.0f;
+            Effect.DiffuseColor = Vector3.One;
+            Effect.AmbientLightColor = Vector3.One;
+            Effect.EmissiveColor = Vector3.Zero;
+            Effect.SpecularColor = Vector3.Zero;
+            Effect.SpecularPower = 0f;
         }
         
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,6 +13,8 @@ public class Core : Game
 {
     internal static Core s_instance;
 
+    private static  Dictionary<string, object> s_blackboard = new Dictionary<string, object>();
+
     /// <summary>
     /// Gets a reference to the Core instance.
     /// </summary>
@@ -21,7 +24,7 @@ public class Core : Game
     public static Matrix Projection;
 
 
-    private static  cube_game_input.InputManager Input;
+    public static  cube_game_input.InputManager Input;
 
 
     // The scene that is currently active.
@@ -98,6 +101,42 @@ public class Core : Game
         ExitOnEscape = true;    
     }
 
+
+    public void SetBlackboard(string key, object value)
+    {
+        s_blackboard[key] = value;
+    }
+
+    public static T GetBlackboard<T>(string key) where T : class
+    {
+        if (s_blackboard.TryGetValue(key, out object value) && value is T typedValue)
+        {
+            return typedValue;
+        }
+        
+        // 对于引用类型，返回更友好的默认值
+        if (typeof(T) == typeof(string))
+        {
+            return (T)(object)string.Empty;
+        }
+        
+        // 对于其他类类型，尝试创建新实例
+        if (typeof(T).IsClass && typeof(T) != typeof(string))
+        {
+            try
+            {
+                return Activator.CreateInstance<T>();
+            }
+            catch
+            {
+                // 如果无法创建实例，返回 null
+                return null;
+            }
+        }
+        
+        return default(T);
+    }
+
     protected override void Initialize()
     {
         base.Initialize();
@@ -123,7 +162,7 @@ public class Core : Game
         SpriteBatch = new SpriteBatch(GraphicsDevice);
 
         // 切换到初始场景
-        ChangeScene(new cube_game_scene.SloveCubeScene());
+        ChangeScene(new cube_game_scene.TitleScene());
     }
 
     protected override void UnloadContent()
@@ -193,6 +232,9 @@ public class Core : Game
         // Force the garbage collector to collect to ensure memory is cleared.
         GC.Collect();
 
+        // 重置图形设备状态
+        ResetGraphicsDeviceState();
+
         // Change the currently active scene to the new scene.
         s_activeScene = s_nextScene;
 
@@ -205,6 +247,24 @@ public class Core : Game
         if (s_activeScene != null)
         {
             s_activeScene.Initialize();
+        }
+    }
+
+    private static void ResetGraphicsDeviceState()
+    {
+        if (GraphicsDevice != null)
+        {
+            // 重置深度缓冲区
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            
+            // 重置剔除模式：剔除顺时针面，保留逆时针面作为正面（右手坐标系习惯）
+            GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
+            
+            // 重置混合状态
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            
+            // 重置采样状态
+            GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace cube_game_scene
         
         // 当前选中的颜色
         private char _selectedColor = 'U';
-        private Color[] _availableColors = new Color[] { Color.White, Color.Yellow, Color.Red, Color.Orange, Color.Green, Color.Blue };
+        private Color[] _availableColors = new Color[] { ColorHelper.White, ColorHelper.Yellow, ColorHelper.Red, ColorHelper.Orange, ColorHelper.Green, ColorHelper.Blue};
         private char[] _availableColorChars = new char[] { 'U', 'D', 'F', 'B', 'L', 'R' };
         private string[] _colorNames = new string[] { "U(白)", "D(黄)", "F(红)", "B(橙)", "L(绿)", "R(蓝)" };
         
@@ -88,21 +88,23 @@ namespace cube_game_scene
             base.Update(gameTime);
 
             // 处理鼠标移动 - 检查按钮悬停状态
-            MouseState mouseState = Mouse.GetState();
-            Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
+            MouseState mouseState = cube_game.Core.Input.Mouse.CurrentState;
+            Vector2 mousePos = new Vector2(cube_game.Core.Input.Mouse.X, cube_game.Core.Input.Mouse.Y);
             _isOutputButtonHovered = _outputButtonRect.Contains((int)mousePos.X, (int)mousePos.Y);
 
-            // 处理鼠标点击
-            if (mouseState.LeftButton == ButtonState.Pressed)
+            if (cube_game.Core.Input.Mouse.IsButtonDown(cube_game_input.MouseButton.Left))
             {
                 Debug.WriteLine($"[BuildScene] 鼠标点击位置: ({mousePos.X}, {mousePos.Y})");
-                
                 // 检查是否点击了输出按钮
                 if (_outputButtonRect.Contains((int)mousePos.X, (int)mousePos.Y))
                 {
                     string outputString = GetCubeStateString();
                     Console.WriteLine($"魔方状态字符串: {outputString}");
                     Debug.WriteLine($"[BuildScene] 输出魔方状态: {outputString}");
+
+                    cube_game.Core.Instance.SetBlackboard("buildCubeState", _cubeState);
+                    cube_game.Core.ChangeScene(new SloveCubeScene());
+                    
                     return;
                 }
                 

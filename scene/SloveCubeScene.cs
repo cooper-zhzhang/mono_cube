@@ -9,7 +9,7 @@ namespace cube_game_scene
     {
         private cube_obj.Cube _cube;
         private string _sloveState;
-        private List<string> _sloveCMD;
+        private List<string> _sloveCmd;
         private int _index = 0;
 
         public override string Name => "SloveCubeScene";
@@ -21,9 +21,16 @@ namespace cube_game_scene
             0.1f,
             100f))
         {
-            _cube = new cube_obj.Cube(Graphics.GraphicsDevice, "URFFUURRLULLFRBBBDDUFDFRUFULLRRDURBLRUFLLFDBBDDFLBDBDB", this);
+            _sloveState = cube_game.Core.GetBlackboard<string>("buildCubeState") as string;
+
+            if (_sloveState == null || _sloveState == "")
+            {
+                _sloveState = "RUDFUURBUFFFLRBBDRDRLRFFDFLRDUUDBBDUURFDLUDBBLLBLBRFLL";
+            }
+            
+            _cube = new cube_obj.Cube(Graphics.GraphicsDevice, _sloveState, this);  
             _cube.createCubeByStage();
-            buildCMD();
+            buildCmd();
         }
 
         public override void Initialize()
@@ -41,23 +48,22 @@ namespace cube_game_scene
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            var keyboardState = Keyboard.GetState();
-            if (_cube.CanInputCmd() && !keyboardState.IsKeyDown(Keys.N))
+            if (_cube.CanInputCmd() && !cube_game.Core.Input.Keyboard.IsKeyDown(Keys.N))
             {
                 return;
             }
 
-            string currentCmd = _index < _sloveCMD.Count ? _sloveCMD[_index] : "";
+            string currentCmd = _index < _sloveCmd.Count ? _sloveCmd[_index] : "";
             if (currentCmd != "")
             {
                 if (_cube.InputCmd(currentCmd))
                 {
-                    Console.WriteLine("currentCmd{0}", currentCmd);
+                    // Console.WriteLine("currentCmd{0}", currentCmd);
                     _index++;
                 }
                 else
                 {
-                    Console.WriteLine("currentCmd failed{0}", currentCmd);
+                    // Console.WriteLine("currentCmd failed{0}", currentCmd);
                 }
             }
 
@@ -87,22 +93,20 @@ namespace cube_game_scene
             base.Dispose(disposing);
         }
 
-        private void buildCMD()
+        private void buildCmd()
         {
-            _sloveCMD = new List<string>();
+            _sloveCmd = new List<string>();
             string slove = _cube.SloveCube();
             // 使用空格将slove 字符串分割为多个命令
-            _sloveCMD.AddRange(slove.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-            // TODO:    删除
-            Console.WriteLine("cmd {0}", slove);
+            _sloveCmd.AddRange(slove.Split(' ', StringSplitOptions.RemoveEmptyEntries));
             // 检测是否为有效的命令
-            for (int i = 0; i < _sloveCMD.Count; i++)
+            for (int i = 0; i < _sloveCmd.Count; i++)
             {
-                Console.WriteLine("cmd \"{0}\" is {1}", _sloveCMD[i], i);
-                if (!tool.RotationHelper.IsValidCmd(_sloveCMD[i]))
+                Console.WriteLine("cmd \"{0}\" is {1}", _sloveCmd[i], i);
+                if (!tool.RotationHelper.IsValidCmd(_sloveCmd[i]))
                 {
-                    Console.WriteLine("cmd {0} is not valid", _sloveCMD[i]);
-                    _sloveCMD.Clear();
+                    Console.WriteLine("cmd {0} is not valid", _sloveCmd[i]);
+                    _sloveCmd.Clear();
                     return;
                 }
             }

@@ -12,9 +12,6 @@ public enum MouseButton
     XButton2
 }
 
-
-
-
 public class MouseInfo 
 {
     /// <summary>
