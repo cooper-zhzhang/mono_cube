@@ -148,7 +148,6 @@ namespace cube_game_scene
             // 重置图形设备状态（确保与 FreeScene 一致）
             Graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             Graphics.GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
-Graphics.GraphicsDevice.RasterizerState =RasterizerState.CullNone;
             Graphics.GraphicsDevice.BlendState = BlendState.Opaque;
 
 
